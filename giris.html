@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yönetici Girişi | Uzel Prestij Garaj</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0A0A0A, #1c1c1c);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.kutu {
+  background: #fff;
+  padding: 48px 40px;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 420px;
+  border-top: 4px solid #C9A961;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
+}
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  margin-bottom: 8px;
+  color: #0A0A0A;
+}
+p { color: #666; margin-bottom: 32px; font-size: 14px; }
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 4px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+input:focus {
+  outline: none;
+  border-color: #C9A961;
+}
+button {
+  width: 100%;
+  padding: 16px;
+  background: #0A0A0A;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+button:hover { background: #C9A961; color: #0A0A0A; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.hata {
+  background: #fee;
+  color: #c00;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  display: none;
+}
+.hata.goster { display: block; }
+.geri {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+}
+.geri:hover { color: #C9A961; }
+</style>
+</head>
+<body>
+  <div class="kutu">
+    <h1>Yönetici Girişi</h1>
+    <p>Uzel Prestij Garaj Panel</p>
+    
+    <div class="hata" id="hata"></div>
+    
+    <form id="girisForm">
+      <label>E-posta</label>
+      <input type="email" id="email" required placeholder="admin@uzelprestijgaraj.com">
+      
+      <label>Şifre</label>
+      <input type="password" id="sifre" required placeholder="••••••••">
+      
+      <button type="submit" id="girisBtn">Giriş Yap</button>
+    </form>
+    
+    <a href="/" class="geri">← Siteye Dön</a>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  
+  <script>
+    const form = document.getElementById('girisForm');
+    const hata = document.getElementById('hata');
+    const btn = document.getElementById('girisBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hata.classList.remove('goster');
+      btn.disabled = true;
+      btn.textContent = 'Giriş yapılıyor...';
+
+      try {
+        await auth.signInWithEmailAndPassword(
+          document.getElementById('email').value,
+          document.getElementById('sifre').value
+        );
+        window.location.href = 'panel.html';
+      } catch (err) {
+        hata.textContent = 'Giriş başarısız: ' + err.message;
+        hata.classList.add('goster');
+        btn.disabled = false;
+        btn.textContent = 'Giriş Yap';
+      }
+    });
+  </script>
+</body>
+</html>
