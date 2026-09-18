@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yönetici Paneli | Uzel Prestij Garaj</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f5f5;
+  color: #0A0A0A;
+}
+.ust {
+  background: #0A0A0A;
+  color: #fff;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #C9A961;
+}
+.ust h1 { font-family: 'Playfair Display', serif; font-size: 22px; }
+.ust h1 span { color: #C9A961; }
+.ust button {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #C9A961;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ust button:hover { background: #C9A961; color: #0A0A0A; }
+
+.icerik { max-width: 1200px; margin: 0 auto; padding: 32px; }
+
+.sekmeler {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #e0e0e0;
+}
+.sekme {
+  padding: 14px 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.sekme.aktif { color: #0A0A0A; border-bottom-color: #C9A961; }
+
+.sayfa { display: none; }
+.sayfa.aktif { display: block; }
+
+.kart {
+  background: #fff;
+  padding: 32px;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+.kart h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.form-grup { margin-bottom: 20px; }
+.form-grup label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.form-grup input, .form-grup select, .form-grup textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.form-grup input:focus, .form-grup select:focus, .form-grup textarea:focus {
+  outline: none;
+  border-color: #C9A961;
+}
+
+.form-satir {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.btn-gondur {
+  background: #0A0A0A;
+  color: #fff;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn-gondur:hover { background: #C9A961; color: #0A0A0A; }
+.btn-gondur:disabled { opacity: 0.5; }
+
+.liste { display: grid; gap: 16px; }
+.liste-item {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 4px;
+  border-left: 3px solid #C9A961;
+  align-items: center;
+}
+.liste-item img {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.liste-item .bilgi { flex: 1; }
+.liste-item h3 { font-size: 16px; margin-bottom: 4px; }
+.liste-item p { font-size: 13px; color: #666; }
+.sil-btn {
+  background: #fee;
+  color: #c00;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.sil-btn:hover { background: #c00; color: #fff; }
+
+.bildirim {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 16px 24px;
+  background: #0A0A0A;
+  color: #fff;
+  border-radius: 4px;
+  border-left: 4px solid #22c55e;
+  display: none;
+  z-index: 9999;
+}
+.bildirim.goster { display: block; animation: kay 0.3s; }
+.bildirim.hata { border-left-color: #ef4444; }
+@keyframes kay {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="ust">
+  <h1>Uzel Prestij <span>Panel</span></h1>
+  <button id="cikisBtn">Çıkış</button>
+</div>
+
+<div class="icerik">
+  <div class="sekmeler">
+    <button class="sekme aktif" data-sekme="araclar">🚗 Araçlar</button>
+    <button class="sekme" data-sekme="ekle">➕ Araç Ekle</button>
+    <button class="sekme" data-sekme="randevular">📅 Randevular</button>
+  </div>
+
+  <!-- ARAÇLAR -->
+  <div class="sayfa aktif" id="sayfa-araclar">
+    <div class="kart">
+      <h2>Mevcut Araçlar</h2>
+      <div class="liste" id="aracListesi">
+        <p style="color:#666;">Yükleniyor...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EKLE -->
+  <div class="sayfa" id="sayfa-ekle">
+    <div class="kart">
+      <h2>Yeni Araç Ekle</h2>
+      <form id="aracForm">
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Marka / Model</label>
+            <input type="text" id="marka" required placeholder="Fiat Egea">
+          </div>
+          <div class="form-grup">
+            <label>Yıl</label>
+            <input type="number" id="yil" required placeholder="2021" min="2000" max="2030">
+          </div>
+        </div>
+
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Vites</label>
+            <select id="vites" required>
+              <option value="">Seçin</option>
+              <option>Manuel</option>
+              <option>Otomatik</option>
+            </select>
+          </div>
+          <div class="form-grup">
+            <label>Yakıt</label>
+            <select id="yakit" required>
+              <option value="">Seçin</option>
+              <option>Benzin</option>
+              <option>Dizel</option>
+              <option>LPG</option>
+              <option>Elektrik</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Günlük Fiyat (₺)</label>
+            <input type="number" id="fiyat" required placeholder="2000">
+          </div>
+          <div class="form-grup">
+            <label>Koltuk Sayısı</label>
+            <input type="number" id="koltuk" value="5" required>
+          </div>
+        </div>
+
+        <div class="form-grup">
+          <label>Araç Fotoğrafı</label>
+          <input type="file" id="foto" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-gondur" id="ekleBtn">Aracı Ekle</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- RANDEVULAR -->
+  <div class="sayfa" id="sayfa-randevular">
+    <div class="kart">
+      <h2>Kiralama Randevuları</h2>
+      <div class="liste" id="randevuListesi">
+        <p style="color:#666;">Yükleniyor...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bildirim" id="bildirim"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+// Giriş kontrolü
+auth.onAuthStateChanged(user => {
+  if (!user) window.location.href = 'giris.html';
+});
+
+// Çıkış
+document.getElementById('cikisBtn').addEventListener('click', () => {
+  auth.signOut().then(() => window.location.href = 'giris.html');
+});
+
+// Sekme geçişi
+document.querySelectorAll('.sekme').forEach(sekme => {
+  sekme.addEventListener('click', () => {
+    document.querySelectorAll('.sekme').forEach(s => s.classList.remove('aktif'));
+    document.querySelectorAll('.sayfa').forEach(s => s.classList.remove('aktif'));
+    sekme.classList.add('aktif');
+    document.getElementById('sayfa-' + sekme.dataset.sekme).classList.add('aktif');
+  });
+});
+
+// Bildirim
+function bildir(mesaj, hata = false) {
+  const b = document.getElementById('bildirim');
+  b.textContent = mesaj;
+  b.className = 'bildirim goster' + (hata ? ' hata' : '');
+  setTimeout(() => b.classList.remove('goster'), 3000);
+}
+
+// Araç ekle
+document.getElementById('aracForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('ekleBtn');
+  btn.disabled = true;
+  btn.textContent = 'Yükleniyor...';
+
+  try {
+    const foto = document.getElementById('foto').files[0];
+    const storageRef = storage.ref('araclar/' + Date.now() + '_' + foto.name);
+    await storageRef.put(foto);
+    const fotoURL = await storageRef.getDownloadURL();
+
+    await db.collection('araclar').add({
+      marka: document.getElementById('marka').value,
+      yil: parseInt(document.getElementById('yil').value),
+      vites: document.getElementById('vites').value,
+      yakit: document.getElementById('yakit').value,
+      fiyat: parseInt(document.getElementById('fiyat').value),
+      koltuk: parseInt(document.getElementById('koltuk').value),
+      foto: fotoURL,
+      tarih: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    bildir('✅ Araç başarıyla eklendi!');
+    document.getElementById('aracForm').reset();
+    araclariYukle();
+    
+    // Araçlar sekmesine geç
+    document.querySelector('[data-sekme="araclar"]').click();
+  } catch (err) {
+    bildir('❌ Hata: ' + err.message, true);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Aracı Ekle';
+});
+
+// Araçları yükle
+async function araclariYukle() {
+  const liste = document.getElementById('aracListesi');
+  try {
+    const snap = await db.collection('araclar').orderBy('tarih', 'desc').get();
+    if (snap.empty) {
+      liste.innerHTML = '<p style="color:#666;">Henüz araç eklenmemiş.</p>';
+      return;
+    }
+    liste.innerHTML = '';
+    snap.forEach(doc => {
+      const a = doc.data();
+      const div = document.createElement('div');
+      div.className = 'liste-item';
+      div.innerHTML = `
+        <img src="${a.foto}" alt="${a.marka}">
+        <div class="bilgi">
+          <h3>${a.marka} (${a.yil})</h3>
+          <p>${a.vites} · ${a.yakit} · ${a.koltuk} kişi</p>
+          <p style="color:#C9A961;font-weight:700;font-size:15px;margin-top:4px;">${a.fiyat.toLocaleString('tr-TR')} ₺/gün</p>
+        </div>
+        <button class="sil-btn" data-id="${doc.id}">Sil</button>
+      `;
+      div.querySelector('.sil-btn').addEventListener('click', async () => {
+        if (confirm('Bu aracı silmek istediğinize emin misiniz?')) {
+          await db.collection('araclar').doc(doc.id).delete();
+          bildir('🗑️ Araç silindi');
+          araclariYukle();
+        }
+      });
+      liste.appendChild(div);
+    });
+  } catch (err) {
+    liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>';
+  }
+}
+
+// Randevuları yükle
+async function randevulariYukle() {
+  const liste = document.getElementById('randevuListesi');
+  try {
+    const snap = await db.collection('randevular').orderBy('tarih', 'desc').get();
+    if (snap.empty) {
+      liste.innerHTML = '<p style="color:#666;">Henüz randevu yok.</p>';
+      return;
+    }
+    liste.innerHTML = '';
+    snap.forEach(doc => {
+      const r = doc.data();
+      const div = document.createElement('div');
+      div.className = 'liste-item';
+      div.innerHTML = `
+        <div class="bilgi">
+          <h3>${r.ad || 'İsimsiz'}</h3>
+          <p>📞 ${r.telefon || '-'}</p>
+          <p>🚗 ${r.arac || '-'} · 📅 ${r.baslangic || '-'} → ${r.bitis || '-'}</p>
+        </div>
+        <button class="sil-btn" data-id="${doc.id}">Sil</button>
+      `;
+      div.querySelector('.sil-btn').addEventListener('click', async () => {
+        if (confirm('Randevuyu sil?')) {
+          await db.collection('randevular').doc(doc.id).delete();
+          bildir('🗑️ Randevu silindi');
+          randevulariYukle();
+        }
+      });
+      liste.appendChild(div);
+    });
+  } catch (err) {
+    liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>';
+  }
+}
+
+// Başlangıç
+window.addEventListener('load', () => {
+  araclariYukle();
+  randevulariYukle();
+});
+</script>
+</body>
+</html>
