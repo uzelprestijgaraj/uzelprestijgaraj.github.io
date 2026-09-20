@@ -308,10 +308,7 @@ document.getElementById('aracForm').addEventListener('submit', async (e) => {
   btn.textContent = 'Yükleniyor...';
 
   try {
-    const foto = document.getElementById('foto').files[0];
-    const storageRef = storage.ref('araclar/' + Date.now() + '_' + foto.name);
-    await storageRef.put(foto);
-    const fotoURL = await storageRef.getDownloadURL();
+    const fotoURL = document.getElementById('foto').value;
 
     await db.collection('araclar').add({
       marka: document.getElementById('marka').value,
