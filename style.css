@@ -1152,5 +1152,23 @@ ul { list-style: none; }
     height: 56px;
   }
   
-  .footer { padding: 56px 18px 0; }
+  .footer { padding: 56px 18px 0;
+}
+   /* Yönetici Girişi */
+.footer-yonetici {
+  text-align: center;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.footer-yonetici a {
+  color: #666;
+  font-size: 12px;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+
+.footer-yonetici a:hover {
+  color: #C9A961;
 }
