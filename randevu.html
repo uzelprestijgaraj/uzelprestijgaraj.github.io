@@ -304,7 +304,7 @@ document.querySelectorAll('.sekme').forEach(sekme => {
 const TEL = '905395253091';
 
 // Kiralama formu
-document.getElementById('form-kiralama').addEventListener('submit', (e) => {
+document.getElementById('form-kiralama').addEventListener('submit', async (e) => {
   e.preventDefault();
   const mesaj = `🚗 *ARAÇ KİRALAMA RANDEVUSU*%0A%0A` +
     `👤 *Ad Soyad:* ${document.getElementById('k_ad').value}%0A` +
@@ -314,11 +314,23 @@ document.getElementById('form-kiralama').addEventListener('submit', (e) => {
     `📅 *Bitiş:* ${document.getElementById('k_bit').value}%0A` +
     `📝 *Not:* ${document.getElementById('k_not').value || '-'}`;
   
-  window.open(`https://wa.me/${TEL}?text=${mesaj}`, '_blank');
+  await db.collection('randevular').add({
+  tip: 'kiralama',
+  ad: document.getElementById('k_ad').value,
+  telefon: document.getElementById('k_tel').value,
+  arac: document.getElementById('k_arac').value,
+  baslangic: document.getElementById('k_bas').value,
+  bitis: document.getElementById('k_bit').value,
+  not: document.getElementById('k_not').value,
+  tarih: firebase.firestore.FieldValue.serverTimestamp(),
+  durum: 'beklemede'
+});
+
+window.open(`https://wa.me/${TEL}?text=${mesaj}`, '_blank');
 });
 
 // Yıkama/Tamir formu
-document.getElementById('form-yikama').addEventListener('submit', (e) => {
+document.getElementById('form-yikama').addEventListener('submit', async (e) => {
   e.preventDefault();
   const mesaj = `✨ *YIKAMA / TAMİR RANDEVUSU*%0A%0A` +
     `👤 *Ad Soyad:* ${document.getElementById('y_ad').value}%0A` +
@@ -329,8 +341,24 @@ document.getElementById('form-yikama').addEventListener('submit', (e) => {
     `🕐 *Saat:* ${document.getElementById('y_saat').value}%0A` +
     `📝 *Not:* ${document.getElementById('y_not').value || '-'}`;
   
-  window.open(`https://wa.me/${TEL}?text=${mesaj}`, '_blank');
+  await db.collection('randevular').add({
+  tip: 'yikama',
+  ad: document.getElementById('y_ad').value,
+  telefon: document.getElementById('y_tel').value,
+  hizmet: document.getElementById('y_hizmet').value,
+  arac: document.getElementById('y_model').value,
+  tarih: document.getElementById('y_tarih').value,
+  saat: document.getElementById('y_saat').value,
+  not: document.getElementById('y_not').value,
+  tarih: firebase.firestore.FieldValue.serverTimestamp(),
+  durum: 'beklemede'
+});
+
+window.open(`https://wa.me/${TEL}?text=${mesaj}`, '_blank');
 });
 </script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 </body>
 </html>
