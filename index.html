@@ -21,6 +21,15 @@
 
 <link rel="stylesheet" href="style.css">
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2H0L1CV0JZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-2H0L1CV0JZ');
+</script>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -46,14 +55,6 @@
   ],
   "priceRange": "₺₺"
 }
-</script>
-  <!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2H0L1CV0JZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-2H0L1CV0JZ');
 </script>
 </head>
 <body>
@@ -85,7 +86,7 @@
       <li><a href="#yikama">Yıkama</a></li>
       <li><a href="#tamir">Tamir</a></li>
       <li><a href="#neden">Neden Biz</a></li>
-      <li><a href="#iletisim">İletişim</a></li><li><a href="randevu.html">Randevu Al</a></li>
+      <li><a href="#iletisim">İletişim</a></li>
     </ul>
     
     <a href="tel:+905395253091" class="nav-telefon">
@@ -156,7 +157,7 @@
   </div>
 </section>
 
-<!-- ARAÇ FİLOSU -->
+<!-- ARAÇ FİLOSU (Firebase'den dinamik) -->
 <section class="bolum" id="filo">
   <div class="konteyner">
     <div class="bolum-ust">
@@ -166,15 +167,12 @@
     </div>
     
     <div class="arac-grid" id="aracGrid">
-  <p style="text-align:center;color:#999;">Araçlar yükleniyor...</p>
-</div>
-      
-      
+      <p style="text-align:center;color:#999;grid-column:1/-1;">Araçlar yükleniyor...</p>
     </div>
   </div>
 </section>
 
-<!-- YIKAMA (üste taşındı) -->
+<!-- YIKAMA -->
 <section class="bolum bolum-koyu" id="yikama">
   <div class="konteyner">
     <div class="iki-kolon ters">
@@ -204,7 +202,7 @@
           </div>
         </div>
         
-        <a href="https://wa.me/905395253091?text=Merhaba,%20yıkama%20randevusu%20almak%20istiyorum" class="btn btn-altin" target="_blank" rel="noopener">Randevu Al</a>
+        <a href="randevu.html" class="btn btn-altin">Randevu Al</a>
       </div>
       <div class="kolon-resim">
         <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800&q=80" alt="Oto Yıkama Samandağ" loading="lazy">
@@ -213,7 +211,7 @@
   </div>
 </section>
 
-<!-- TAMİR (alta indi) -->
+<!-- TAMİR -->
 <section class="bolum" id="tamir">
   <div class="konteyner">
     <div class="iki-kolon">
@@ -243,7 +241,7 @@
           </div>
         </div>
         
-        <a href="https://wa.me/905395253091?text=Merhaba,%20tamir%20randevusu%20almak%20istiyorum" class="btn btn-altin" target="_blank" rel="noopener">Randevu Al</a>
+        <a href="randevu.html" class="btn btn-altin">Randevu Al</a>
       </div>
       <div class="kolon-resim">
         <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&q=80" alt="Oto Tamir Samandağ" loading="lazy">
@@ -387,12 +385,13 @@
     </div>
   </div>
 
+  <div class="footer-yonetici">
+    <a href="giris.html">🔐 Yönetici Girişi</a>
+  </div>
+
   <div class="footer-alt">
     <p>© 2025 Uzel Prestij Garaj. Tüm hakları saklıdır.</p>
   </div>
-  <div class="footer-yonetici">
-  <a href="giris.html">🔐 Yönetici Girişi</a>
-</div>
 </footer>
 
 <!-- SABİT WHATSAPP -->
@@ -402,6 +401,70 @@
   </svg>
 </a>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<!-- ARAÇLARI FIREBASE'DEN ÇEK -->
+<script>
+async function araclariYukle() {
+  const grid = document.getElementById('aracGrid');
+  
+  try {
+    const snap = await db.collection('araclar').orderBy('tarih', 'desc').get();
+    
+    if (snap.empty) {
+      grid.innerHTML = '<p style="text-align:center;color:#999;grid-column:1/-1;">Henüz araç eklenmemiş.</p>';
+      return;
+    }
+    
+    grid.innerHTML = '';
+    
+    snap.forEach(doc => {
+      const a = doc.data();
+      const kart = document.createElement('article');
+      kart.className = 'arac-karti';
+      kart.innerHTML = `
+        <div class="arac-resim">
+          <img src="${a.foto}" alt="${a.marka} ${a.yil} Kiralık Samandağ" loading="lazy">
+          <span class="arac-rozet">MÜSAİT</span>
+        </div>
+        <div class="arac-bilgi">
+          <div class="arac-ust">
+            <h3>${a.marka}</h3>
+            <span class="arac-yil">${a.yil}</span>
+          </div>
+          <div class="arac-ozellikler">
+            <span>⚙️ ${a.vites}</span>
+            <span>⛽ ${a.yakit}</span>
+            <span>👥 ${a.koltuk} Kişi</span>
+            <span>❄️ Klimalı</span>
+          </div>
+          <div class="arac-fiyat">
+            <span class="fiyat">${a.fiyat.toLocaleString('tr-TR')}</span>
+            <span class="para">₺</span>
+            <span class="periyot">/ gün</span>
+          </div>
+          <div class="arac-butonlar">
+            <a href="randevu.html" class="btn-kirala">Kirala</a>
+            <a href="tel:+905395253091" class="btn-ara" aria-label="Ara">📞</a>
+          </div>
+        </div>
+      `;
+      grid.appendChild(kart);
+    });
+  } catch (err) {
+    grid.innerHTML = '<p style="text-align:center;color:#c00;grid-column:1/-1;">Araçlar yüklenemedi: ' + err.message + '</p>';
+  }
+}
+
+window.addEventListener('load', araclariYukle);
+</script>
+
+<!-- MEVCUT SCRIPT -->
 <script src="script.js"></script>
+
 </body>
 </html>
