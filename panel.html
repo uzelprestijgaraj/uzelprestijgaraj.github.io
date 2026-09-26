@@ -6,353 +6,588 @@
 <title>Yönetici Paneli | Uzel Prestij Garaj</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #0a0a0a; }
-
-.ust { background: #0a0a0a; color: #fff; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
-.ust h1 { font-family: 'Playfair Display', serif; font-size: 22px; }
-.ust h1 span { color: #c9a961; }
-.ust button { background: transparent; color: #fff; border: 1px solid #c9a961; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
-.ust button:hover { background: #c9a961; color: #0a0a0a; }
-
-.sekmeler { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 2px solid #e0e0e0; padding: 24px 32px 0; background: #fff; }
-.sekme { padding: 14px 28px; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; }
-.sekme.aktif { color: #0a0a0a; border-bottom: 3px solid #c9a961; }
+body { font-family: 'Inter', Arial, sans-serif; background: #f5f5f5; color: #0A0A0A; }
+.ust { background: #0A0A0A; color: #fff; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #C9A961; }
+.ust h1 { font-family: Georgia, serif; font-size: 22px; }
+.ust h1 span { color: #C9A961; }
+.ust button { background: transparent; color: #fff; border: 1px solid #C9A961; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+.ust button:hover { background: #C9A961; color: #0A0A0A; }
 
 .icerik { max-width: 1200px; margin: 0 auto; padding: 32px; }
+.sekmeler { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 2px solid #e0e0e0; }
+.sekme { padding: 14px 28px; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; font-family: inherit; }
+.sekme.aktif { color: #0A0A0A; border-bottom-color: #C9A961; }
 .sayfa { display: none; }
 .sayfa.aktif { display: block; }
 
-/* ARAÇ KARTI */
-.arac-kart { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; display: flex; gap: 24px; align-items: flex-start; border-left: 4px solid #c9a961; }
-.arac-kart img { width: 140px; height: 90px; object-fit: cover; border-radius: 6px; }
-.arac-bilgi { flex: 1; }
-.arac-bilgi h3 { font-size: 18px; margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.kart { background: #fff; padding: 32px; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; }
+.kart h2 { font-family: Georgia, serif; font-size: 22px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
 
-/* PLAKA */
-.plaka {
-    display: inline-block;
-    background: #fff;
-    border: 2px solid #000;
-    border-radius: 4px;
-    padding: 4px 12px;
-    font-family: 'Arial Black', sans-serif;
-    font-weight: 900;
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: #000;
-    vertical-align: middle;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.plaka.kucuk { font-size: 11px; padding: 3px 9px; }
+.form-grup { margin-bottom: 20px; }
+.form-grup label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+.form-grup input, .form-grup select, .form-grup textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 4px; font-size: 14px; font-family: inherit; }
+.form-grup input:focus, .form-grup select:focus, .form-grup textarea:focus { outline: none; border-color: #C9A961; }
+.form-satir { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-.durum { font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
-.durum.musait { background: #d4f5dd; color: #1a7a3a; }
-.durum.kirada { background: #ffe0e0; color: #b3261e; }
-.durum.bakim { background: #fff3cd; color: #856404; }
-.detay { font-size: 13px; color: #777; margin-bottom: 6px; }
-.fiyat { color: #b3261e; font-weight: 700; font-size: 15px; }
+.btn-gondur { background: #0A0A0A; color: #fff; padding: 14px 32px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+.btn-gondur:hover { background: #C9A961; color: #0A0A0A; }
+.btn-gondur:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.butonlar { display: flex; flex-direction: column; gap: 8px; }
-.btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; }
-.btn-mavi { background: #2196f3; color: #fff; }
-.btn-mavi:hover { background: #1976d2; }
-.btn-yesil { background: #4caf50; color: #fff; }
-.btn-yesil:hover { background: #388e3c; }
-.btn-kirmizi { background: #ffebee; color: #d32f2f; }
-.btn-kirmizi:hover { background: #ffcdd2; }
+.liste { display: grid; gap: 16px; }
+.liste-item { display: flex; gap: 20px; padding: 16px; background: #fafafa; border-radius: 4px; border-left: 3px solid #C9A961; align-items: center; }
+.liste-item img { width: 100px; height: 70px; object-fit: cover; border-radius: 4px; background: #eee; }
+.liste-item .bilgi { flex: 1; }
+.liste-item h3 { font-size: 16px; margin-bottom: 4px; }
+.liste-item p { font-size: 13px; color: #666; }
+.sil-btn { background: #fee; color: #c00; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; }
+.sil-btn:hover { background: #c00; color: #fff; }
 
-/* ÇIKIŞ / DÖNÜŞ KUTUSU */
-.cikis-donus { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-.kutu { padding: 14px; background: #f9f9f9; border-radius: 6px; border-left: 3px solid #2196f3; }
-.kutu.donus { border-left-color: #4caf50; }
-.kutu h4 { font-size: 12px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-.kutu p { font-size: 13px; margin-bottom: 5px; }
-.kutu p strong { font-weight: 600; }
+.durum { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-left: 8px; }
+.durum-musait { background: #dcfce7; color: #166534; }
+.durum-kirada { background: #fee2e2; color: #991b1b; }
 
-/* FORM */
-.form-kutu { background: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 700px; }
-.form-kutu h2 { margin-bottom: 24px; }
-.form-grup { margin-bottom: 18px; }
-.form-grup label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #444; }
-.form-grup input, .form-grup select, .form-grup textarea { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
-.form-grup input:focus, .form-grup select:focus { outline: none; border-color: #c9a961; }
-.form-ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.btn-kaydet { background: #c9a961; color: #0a0a0a; padding: 13px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 14px; }
-.btn-kaydet:hover { background: #b08d4a; }
+.bildirim { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; background: #0A0A0A; color: #fff; border-radius: 4px; border-left: 4px solid #22c55e; display: none; z-index: 9999; font-size: 14px; }
+.bildirim.goster { display: block; }
+.bildirim.hata { border-left-color: #ef4444; }
 
-@media (max-width: 700px) {
-    .arac-kart { flex-direction: column; }
-    .cikis-donus, .form-ikili { grid-template-columns: 1fr; }
-    .sekmeler { overflow-x: auto; }
-}
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
+.modal.goster { display: flex; }
+.modal-icerik { background: #fff; padding: 32px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-icerik h3 { font-family: Georgia, serif; font-size: 22px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+.modal-butonlar { display: flex; gap: 12px; margin-top: 24px; }
+.modal-butonlar button { flex: 1; padding: 14px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+.modal-iptal { background: #f0f0f0; color: #666; }
+.modal-iptal:hover { background: #e0e0e0; }
+.btn-kirala-ver { background: #0ea5e9; color: #fff; }
+.btn-kirala-ver:hover { background: #0284c7; }
+.btn-iade-al { background: #22c55e; color: #fff; }
+.btn-iade-al:hover { background: #16a34a; }
+
+.hesap-kutu { background: #f8f8f8; padding: 16px; border-radius: 6px; margin: 16px 0; border-left: 4px solid #C9A961; }
+.hesap-kutu p { margin: 6px 0; font-size: 14px; }
+.hesap-kutu strong { color: #0A0A0A; }
+.hesap-tutar { font-size: 22px !important; color: #c00 !important; font-weight: 700; }
 </style>
 </head>
 <body>
 
-<!-- ÜST BAR -->
 <div class="ust">
-    <h1>Uzel Prestij <span>Garaj</span> | Yönetici Paneli</h1>
-    <button onclick="alert('Çıkış yapıldı')">ÇIKIŞ</button>
-</div>
-
-<!-- SEKMELER -->
-<div class="sekmeler">
-    <button class="sekme aktif" onclick="sekmeAc('araclar', this)">🚗 Araçlar</button>
-    <button class="sekme" onclick="sekmeAc('ekle', this)">➕ Araç Ekle</button>
-    <button class="sekme" onclick="sekmeAc('kiralama', this)">🔑 Kiralama Başlat</button>
-    <button class="sekme" onclick="sekmeAc('randevular', this)">📅 Randevular</button>
-    <button class="sekme" onclick="sekmeAc('gecmis', this)">📜 Geçmiş</button>
+  <h1>Uzel Prestij <span>Panel</span></h1>
+  <button id="cikisBtn">Çıkış</button>
 </div>
 
 <div class="icerik">
+  <div class="sekmeler">
+    <button class="sekme aktif" data-sekme="araclar">🚗 Araçlar</button>
+    <button class="sekme" data-sekme="ekle">➕ Araç Ekle</button>
+    <button class="sekme" data-sekme="randevular">📅 Randevular</button>
+    <button class="sekme" data-sekme="kiralamalar">🚙 Kiralamalar</button>
+  </div>
 
-    <!-- SAYFA: ARAÇLAR -->
-    <div id="araclar" class="sayfa aktif">
-        <h2 style="margin-bottom:24px;">Mevcut Araçlar</h2>
+  <!-- ARAÇLAR -->
+  <div class="sayfa aktif" id="sayfa-araclar">
+    <div class="kart">
+      <h2>Mevcut Araçlar</h2>
+      <div class="liste" id="aracListesi">
+        <p style="color:#666;">Yükleniyor...</p>
+      </div>
+    </div>
+  </div>
 
-        <!-- MÜSAİT ARAÇ -->
-        <div class="arac-kart">
-            <img src="https://images.unsplash.com/photo-1549927681-0b673b8243ab?auto=format&fit=crop&w=400&q=80" alt="Dacia Duster">
-            <div class="arac-bilgi">
-                <h3>Dacia Duster (2023)
-                    <span class="plaka">31 ABC 123</span>
-                    <span class="durum musait">MÜSAİT</span>
-                </h3>
-                <div class="detay">Manuel • Dizel • 5 kişi • KM: 45.300</div>
-                <div class="fiyat">2.300 ₺/gün</div>
-            </div>
-            <div class="butonlar">
-                <button class="btn btn-mavi">KİRAYA VER</button>
-                <button class="btn btn-kirmizi">SİL</button>
-            </div>
+  <!-- ARAÇ EKLE -->
+  <div class="sayfa" id="sayfa-ekle">
+    <div class="kart">
+      <h2>Yeni Araç Ekle</h2>
+      <form id="aracForm">
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Marka / Model</label>
+            <input type="text" id="marka" required placeholder="Fiat Egea">
+          </div>
+          <div class="form-grup">
+            <label>Model Yılı</label>
+            <input type="number" id="yil" required placeholder="2021" min="2000" max="2030">
+          </div>
         </div>
 
-        <!-- KİRADA ARAÇ -->
-        <div class="arac-kart">
-            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=400&q=80" alt="Fiat Egea">
-            <div class="arac-bilgi">
-                <h3>Fiat Egea (2021)
-                    <span class="plaka">31 XYZ 456</span>
-                    <span class="durum kirada">KİRADA</span>
-                </h3>
-                <div class="detay">Otomatik • Dizel • 5 kişi</div>
-                <div class="fiyat">2.100 ₺/gün</div>
-
-                <!-- ÇIKIŞ / DÖNÜŞ -->
-                <div class="cikis-donus">
-                    <div class="kutu">
-                        <h4>↗️ Çıkış Bilgisi</h4>
-                        <p><strong>Müşteri:</strong> Ahmet Yılmaz</p>
-                        <p><strong>Telefon:</strong> 0539 525 30 91</p>
-                        <p><strong>Tarih:</strong> 12.09.2026 • 10:30</p>
-                        <p><strong>Çıkış KM:</strong> 62.100</p>
-                        <p><strong>Araç Plaka:</strong> <span class="plaka kucuk">31 XYZ 456</span></p>
-                    </div>
-                    <div class="kutu donus">
-                        <h4>↙️ Dönüş Bilgisi (Beklenen)</h4>
-                        <p><strong>Aynı Araç:</strong> Fiat Egea</p>
-                        <p><strong>Plaka:</strong> <span class="plaka kucuk">31 XYZ 456</span></p>
-                        <p><strong>Tarih:</strong> 19.09.2026 • 10:30</p>
-                        <p><strong>Süre:</strong> 7 gün</p>
-                        <p><strong>Toplam:</strong> 14.700 ₺</p>
-                    </div>
-                </div>
-            </div>
-            <div class="butonlar">
-                <button class="btn btn-yesil">DÖNÜŞÜ AL</button>
-                <button class="btn btn-kirmizi">SİL</button>
-            </div>
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Vites</label>
+            <select id="vites" required>
+              <option value="">Seçin</option>
+              <option>Manuel</option>
+              <option>Otomatik</option>
+            </select>
+          </div>
+          <div class="form-grup">
+            <label>Yakıt</label>
+            <select id="yakit" required>
+              <option value="">Seçin</option>
+              <option>Benzin</option>
+              <option>Dizel</option>
+              <option>LPG</option>
+              <option>Elektrik</option>
+            </select>
+          </div>
         </div>
 
-        <!-- BAKIMDA ARAÇ -->
-        <div class="arac-kart">
-            <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=400&q=80" alt="Renault Symbol">
-            <div class="arac-bilgi">
-                <h3>Renault Symbol (2021)
-                    <span class="plaka">31 DEF 789</span>
-                    <span class="durum bakim">BAKIMDA</span>
-                </h3>
-                <div class="detay">Manuel • Benzin • 5 kişi • KM: 38.500</div>
-                <div class="fiyat">1.800 ₺/gün</div>
-            </div>
-            <div class="butonlar">
-                <button class="btn btn-mavi" disabled style="opacity:0.5;">KİRAYA VER</button>
-                <button class="btn btn-kirmizi">SİL</button>
-            </div>
+        <div class="form-satir">
+          <div class="form-grup">
+            <label>Kişi Sayısı</label>
+            <input type="number" id="koltuk" value="5" required min="1" max="9">
+          </div>
+          <div class="form-grup">
+            <label>Günlük Fiyat (₺)</label>
+            <input type="number" id="fiyat" required placeholder="2000">
+          </div>
         </div>
-    </div>
 
-    <!-- SAYFA: ARAÇ EKLE -->
-    <div id="ekle" class="sayfa">
-        <div class="form-kutu">
-            <h2>Araç Ekle</h2>
-
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Marka / Model</label>
-                    <input type="text" placeholder="Örn: Fiat Egea">
-                </div>
-                <div class="form-grup">
-                    <label>Model Yılı</label>
-                    <input type="number" placeholder="2023">
-                </div>
-            </div>
-
-            <div class="form-grup">
-                <label>Plaka</label>
-                <input type="text" placeholder="31 ABC 123" style="text-transform:uppercase; letter-spacing:2px; font-weight:700;">
-            </div>
-
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Vites</label>
-                    <select>
-                        <option>Manuel</option>
-                        <option>Otomatik</option>
-                    </select>
-                </div>
-                <div class="form-grup">
-                    <label>Yakıt</label>
-                    <select>
-                        <option>Benzin</option>
-                        <option>Dizel</option>
-                        <option>LPG</option>
-                        <option>Elektrik</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Kişi Sayısı</label>
-                    <input type="number" placeholder="5">
-                </div>
-                <div class="form-grup">
-                    <label>Günlük Fiyat (₺)</label>
-                    <input type="number" placeholder="2000">
-                </div>
-            </div>
-
-            <div class="form-grup">
-                <label>Güncel KM</label>
-                <input type="number" placeholder="45100">
-            </div>
-
-            <div class="form-grup">
-                <label>Fotoğraf URL</label>
-                <input type="text" placeholder="https://...">
-            </div>
-
-            <button class="btn-kaydet">ARACI KAYDET</button>
+        <div class="form-grup">
+          <label>Güncel KM</label>
+          <input type="number" id="km" required placeholder="45000">
         </div>
-    </div>
 
-    <!-- SAYFA: KİRALAMA BAŞLAT -->
-    <div id="kiralama" class="sayfa">
-        <div class="form-kutu">
-            <h2>Yeni Kiralama Başlat</h2>
-
-            <div class="form-grup">
-                <label>Kiralanacak Araç</label>
-                <select>
-                    <option>Dacia Duster — 31 ABC 123</option>
-                    <option>Renault Symbol — 31 DEF 789</option>
-                </select>
-            </div>
-
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Müşteri Adı Soyadı</label>
-                    <input type="text" placeholder="Ahmet Yılmaz">
-                </div>
-                <div class="form-grup">
-                    <label>Telefon</label>
-                    <input type="tel" placeholder="0539 525 30 91">
-                </div>
-            </div>
-
-            <div class="form-grup">
-                <label>TC Kimlik No</label>
-                <input type="text" placeholder="12345678901" maxlength="11">
-            </div>
-
-            <!-- ÇIKIŞ -->
-            <h3 style="margin:24px 0 12px; font-size:15px; color:#2196f3;">↗️ Çıkış Bilgileri</h3>
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Çıkış Tarihi</label>
-                    <input type="date">
-                </div>
-                <div class="form-grup">
-                    <label>Çıkış Saati</label>
-                    <input type="time">
-                </div>
-            </div>
-            <div class="form-grup">
-                <label>Çıkış KM</label>
-                <input type="number" placeholder="45100">
-            </div>
-
-            <!-- DÖNÜŞ -->
-            <h3 style="margin:24px 0 12px; font-size:15px; color:#4caf50;">↙️ Dönüş Bilgileri (Beklenen)</h3>
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Dönüş Tarihi</label>
-                    <input type="date">
-                </div>
-                <div class="form-grup">
-                    <label>Dönüş Saati</label>
-                    <input type="time">
-                </div>
-            </div>
-
-            <div class="form-ikili">
-                <div class="form-grup">
-                    <label>Gün Sayısı</label>
-                    <input type="number" placeholder="7">
-                </div>
-                <div class="form-grup">
-                    <label>Toplam Ücret (₺)</label>
-                    <input type="number" placeholder="16100">
-                </div>
-            </div>
-
-            <div class="form-grup">
-                <label>Depozito (₺)</label>
-                <input type="number" placeholder="2000">
-            </div>
-
-            <div class="form-grup">
-                <label>Notlar</label>
-                <textarea rows="3" placeholder="Ek sürücü, özel talepler..."></textarea>
-            </div>
-
-            <button class="btn-kaydet">KİRALAMAYI BAŞLAT</button>
+        <div class="form-grup">
+          <label>Fotoğraf URL</label>
+          <input type="url" id="foto" required placeholder="https://i.ibb.co/xxxxx/foto.jpg">
         </div>
-    </div>
 
-    <!-- SAYFA: RANDEVULAR -->
-    <div id="randevular" class="sayfa">
-        <h2 style="margin-bottom:24px;">Randevular</h2>
-        <p style="color:#777;">Henüz randevu bulunmuyor.</p>
+        <button type="submit" class="btn-gondur" id="ekleBtn">Aracı Kaydet</button>
+      </form>
     </div>
+  </div>
 
-    <!-- SAYFA: GEÇMİŞ -->
-    <div id="gecmis" class="sayfa">
-        <h2 style="margin-bottom:24px;">Kiralama Geçmişi</h2>
-        <p style="color:#777;">Henüz tamamlanmış kiralama bulunmuyor.</p>
+  <!-- RANDEVULAR -->
+  <div class="sayfa" id="sayfa-randevular">
+    <div class="kart">
+      <h2>Gelen Randevular</h2>
+      <div class="liste" id="randevuListesi">
+        <p style="color:#666;">Yükleniyor...</p>
+      </div>
     </div>
+  </div>
 
+  <!-- KİRALAMALAR -->
+  <div class="sayfa" id="sayfa-kiralamalar">
+    <div class="kart">
+      <h2>Kiralama Geçmişi</h2>
+      <div class="liste" id="kiralamaListesi">
+        <p style="color:#666;">Yükleniyor...</p>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div class="bildirim" id="bildirim"></div>
+
+<!-- KİRAYA VER MODAL -->
+<div class="modal" id="kiralaModal">
+  <div class="modal-icerik">
+    <h3>🚙 Aracı Kiraya Ver</h3>
+    <input type="hidden" id="kiralaAracId">
+    <div class="form-grup"><label>Müşteri Adı</label><input type="text" id="k_musteri"></div>
+    <div class="form-grup"><label>Telefon</label><input type="tel" id="k_telefon" placeholder="05XX XXX XX XX"></div>
+    <div class="form-satir">
+      <div class="form-grup"><label>Çıkış Tarihi</label><input type="date" id="k_cikis"></div>
+      <div class="form-grup"><label>İade Tarihi</label><input type="date" id="k_iade"></div>
+    </div>
+    <div class="form-grup"><label>Çıkış KM</label><input type="number" id="k_cikis_km"></div>
+    <div class="modal-butonlar">
+      <button class="modal-iptal" onclick="kiralaModalKapat()">İptal</button>
+      <button class="btn-kirala-ver" onclick="aracKirala()">Kiraya Ver</button>
+    </div>
+  </div>
+</div>
+
+<!-- İADE AL MODAL -->
+<div class="modal" id="iadeModal">
+  <div class="modal-icerik">
+    <h3>✅ Aracı İade Al</h3>
+    <input type="hidden" id="iadeKiralamaId">
+    <input type="hidden" id="iadeAracId">
+    <input type="hidden" id="iadeCikisKm">
+    <input type="hidden" id="iadeCikisTarih">
+    <div class="form-grup"><label>Dönüş KM</label><input type="number" id="i_donus_km" placeholder="45500"></div>
+    <div id="hesapOnizleme" class="hesap-kutu" style="display:none;"></div>
+    <div class="modal-butonlar">
+      <button class="modal-iptal" onclick="iadeModalKapat()">İptal</button>
+      <button class="btn-iade-al" onclick="aracIadeAl()">İade Al</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
 <script>
-function sekmeAc(id, el) {
-    document.querySelectorAll('.sayfa').forEach(s => s.classList.remove('aktif'));
+const GUNLUK_LIMIT = 200;
+const ASIM_UCRETI = 5;
+
+// GİRİŞ KONTROLÜ
+auth.onAuthStateChanged(user => {
+  if (!user) { window.location.href = 'giris.html'; }
+  else { araclariYukle(); randevulariYukle(); kiralamalariYukle(); }
+});
+
+// ÇIKIŞ
+document.getElementById('cikisBtn').addEventListener('click', () => {
+  auth.signOut().then(() => window.location.href = 'giris.html');
+});
+
+// SEKME GEÇİŞİ
+document.querySelectorAll('.sekme').forEach(sekme => {
+  sekme.addEventListener('click', () => {
     document.querySelectorAll('.sekme').forEach(s => s.classList.remove('aktif'));
-    document.getElementById(id).classList.add('aktif');
-    el.classList.add('aktif');
+    document.querySelectorAll('.sayfa').forEach(s => s.classList.remove('aktif'));
+    sekme.classList.add('aktif');
+    document.getElementById('sayfa-' + sekme.dataset.sekme).classList.add('aktif');
+  });
+});
+
+// BİLDİRİM
+function bildir(mesaj, hata = false) {
+  const b = document.getElementById('bildirim');
+  b.textContent = mesaj;
+  b.className = 'bildirim goster' + (hata ? ' hata' : '');
+  setTimeout(() => b.classList.remove('goster'), 3000);
+}
+
+// ARAÇ EKLE
+document.getElementById('aracForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('ekleBtn');
+  btn.disabled = true;
+  btn.textContent = 'Kaydediliyor...';
+
+  try {
+    const fotoURL = document.getElementById('foto').value.trim();
+    
+    await db.collection('araclar').add({
+      marka: document.getElementById('marka').value.trim(),
+      yil: parseInt(document.getElementById('yil').value),
+      vites: document.getElementById('vites').value,
+      yakit: document.getElementById('yakit').value,
+      fiyat: parseInt(document.getElementById('fiyat').value),
+      koltuk: parseInt(document.getElementById('koltuk').value),
+      km: parseInt(document.getElementById('km').value),
+      foto: fotoURL,
+      durum: 'musait',
+      tarih: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    bildir('✅ Araç başarıyla eklendi!');
+    document.getElementById('aracForm').reset();
+    await araclariYukle();
+    document.querySelector('[data-sekme="araclar"]').click();
+  } catch (err) {
+    console.error('Ekleme hatası:', err);
+    bildir('❌ Hata: ' + err.message, true);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Aracı Kaydet';
+});
+
+// ARAÇLARI YÜKLE
+async function araclariYukle() {
+  const liste = document.getElementById('aracListesi');
+  liste.innerHTML = '<p style="color:#666;">Yükleniyor...</p>';
+  
+  try {
+    const snap = await db.collection('araclar').orderBy('tarih', 'desc').get();
+    
+    if (snap.empty) {
+      liste.innerHTML = '<p style="color:#666;">Henüz araç eklenmemiş.</p>';
+      return;
+    }
+    
+    liste.innerHTML = '';
+    snap.forEach(doc => {
+      const a = doc.data();
+      const div = document.createElement('div');
+      div.className = 'liste-item';
+      
+      const durumClass = a.durum === 'kirada' ? 'durum-kirada' : 'durum-musait';
+      const durumText = a.durum === 'kirada' ? 'KİRADA' : 'MÜSAİT';
+      
+      div.innerHTML = `
+        <img src="${a.foto}" alt="${a.marka}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>'">
+        <div class="bilgi">
+          <h3>${a.marka} (${a.yil}) <span class="durum ${durumClass}">${durumText}</span></h3>
+          <p>${a.vites} · ${a.yakit} · ${a.koltuk} kişi · ${a.km ? a.km.toLocaleString('tr-TR') + ' km' : 'KM yok'}</p>
+          <p style="color:#C9A961;font-weight:700;font-size:15px;margin-top:4px;">${a.fiyat.toLocaleString('tr-TR')} ₺/gün</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-direction:column;">
+          ${a.durum === 'kirada' 
+            ? `<button class="btn-gondur btn-iade-al" style="padding:10px 16px;font-size:11px;" onclick="iadeModalAc('${doc.id}')">İADE AL</button>` 
+            : `<button class="btn-gondur btn-kirala-ver" style="padding:10px 16px;font-size:11px;" onclick="kiralaModalAc('${doc.id}', ${a.km || 0})">KİRAYA VER</button>`
+          }
+          <button class="sil-btn" onclick="aracSil('${doc.id}')">Sil</button>
+        </div>
+      `;
+      liste.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Yükleme hatası:', err);
+    liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>';
+  }
+}
+
+// ARAÇ SİL
+async function aracSil(id) {
+  if (!confirm('Bu aracı silmek istediğinize emin misiniz?')) return;
+  
+  try {
+    await db.collection('araclar').doc(id).delete();
+    bildir('🗑️ Araç silindi');
+    await araclariYukle();
+  } catch (err) {
+    console.error('Silme hatası:', err);
+    bildir('❌ Silme hatası: ' + err.message, true);
+  }
+}
+
+// KİRAYA VER MODAL AÇ
+function kiralaModalAc(aracId, mevcutKm) {
+  document.getElementById('kiralaAracId').value = aracId;
+  document.getElementById('k_cikis_km').value = mevcutKm || '';
+  const bugun = new Date().toISOString().split('T')[0];
+  document.getElementById('k_cikis').value = bugun;
+  document.getElementById('k_musteri').value = '';
+  document.getElementById('k_telefon').value = '';
+  document.getElementById('k_iade').value = '';
+  document.getElementById('kiralaModal').classList.add('goster');
+}
+
+function kiralaModalKapat() {
+  document.getElementById('kiralaModal').classList.remove('goster');
+}
+
+// ARAÇ KİRALA
+async function aracKirala() {
+  const aracId = document.getElementById('kiralaAracId').value;
+  const musteri = document.getElementById('k_musteri').value.trim();
+  const telefon = document.getElementById('k_telefon').value.trim();
+  const cikis = document.getElementById('k_cikis').value;
+  const iade = document.getElementById('k_iade').value;
+  const cikisKm = parseInt(document.getElementById('k_cikis_km').value);
+
+  if (!musteri || !telefon || !cikis || !iade || !cikisKm) {
+    bildir('Lütfen tüm alanları doldurun', true);
+    return;
+  }
+
+  try {
+    await db.collection('kiralamalar').add({
+      aracId, musteri, telefon, cikis, iade, cikisKm,
+      durum: 'kirada',
+      tarih: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    await db.collection('araclar').doc(aracId).update({ durum: 'kirada' });
+    
+    bildir('✅ Araç kiraya verildi');
+    kiralaModalKapat();
+    await araclariYukle();
+    await kiralamalariYukle();
+  } catch (err) {
+    console.error('Kiralama hatası:', err);
+    bildir('❌ Hata: ' + err.message, true);
+  }
+}
+
+// İADE AL MODAL AÇ
+async function iadeModalAc(aracId) {
+  try {
+    const kSnap = await db.collection('kiralamalar')
+      .where('aracId', '==', aracId)
+      .where('durum', '==', 'kirada')
+      .limit(1)
+      .get();
+    
+    if (kSnap.empty) {
+      bildir('Aktif kiralama bulunamadı', true);
+      return;
+    }
+    
+    const k = kSnap.docs[0].data();
+    document.getElementById('iadeKiralamaId').value = kSnap.docs[0].id;
+    document.getElementById('iadeAracId').value = aracId;
+    document.getElementById('iadeCikisKm').value = k.cikisKm;
+    document.getElementById('iadeCikisTarih').value = k.cikis;
+    document.getElementById('i_donus_km').value = '';
+    document.getElementById('hesapOnizleme').style.display = 'none';
+    document.getElementById('iadeModal').classList.add('goster');
+  } catch (err) {
+    console.error('İade modal hatası:', err);
+    bildir('❌ Hata: ' + err.message, true);
+  }
+}
+
+function iadeModalKapat() {
+  document.getElementById('iadeModal').classList.remove('goster');
+}
+
+// OTOMATİK HESAPLAMA
+document.getElementById('i_donus_km').addEventListener('input', () => {
+  const cikisKm = parseInt(document.getElementById('iadeCikisKm').value) || 0;
+  const donusKm = parseInt(document.getElementById('i_donus_km').value) || 0;
+  const cikisTarih = new Date(document.getElementById('iadeCikisTarih').value);
+  const bugun = new Date();
+  const gunSayisi = Math.max(1, Math.ceil((bugun - cikisTarih) / (1000 * 60 * 60 * 24)));
+  
+  const toplamKm = donusKm - cikisKm;
+  const limit = gunSayisi * GUNLUK_LIMIT;
+  const asim = Math.max(0, toplamKm - limit);
+  const ucret = asim * ASIM_UCRETI;
+  
+  const kutu = document.getElementById('hesapOnizleme');
+  kutu.style.display = 'block';
+  kutu.innerHTML = `
+    <p>📅 <strong>Kiralama süresi:</strong> ${gunSayisi} gün</p>
+    <p>🛣️ <strong>Toplam KM:</strong> ${toplamKm} km</p>
+    <p>📊 <strong>Limit:</strong> ${limit} km</p>
+    <p>⚠️ <strong>Aşım:</strong> ${asim} km</p>
+    <p class="hesap-tutar">💰 Ek Ücret: ${ucret.toLocaleString('tr-TR')} ₺</p>
+  `;
+});
+
+// ARAÇ İADE AL
+async function aracIadeAl() {
+  const kiralamaId = document.getElementById('iadeKiralamaId').value;
+  const aracId = document.getElementById('iadeAracId').value;
+  const cikisKm = parseInt(document.getElementById('iadeCikisKm').value);
+  const donusKm = parseInt(document.getElementById('i_donus_km').value);
+  const cikisTarih = new Date(document.getElementById('iadeCikisTarih').value);
+  const bugun = new Date();
+  const gunSayisi = Math.max(1, Math.ceil((bugun - cikisTarih) / (1000 * 60 * 60 * 24)));
+  
+  const toplamKm = donusKm - cikisKm;
+  const limit = gunSayisi * GUNLUK_LIMIT;
+  const asim = Math.max(0, toplamKm - limit);
+  const ucret = asim * ASIM_UCRETI;
+
+  if (!donusKm || donusKm < cikisKm) {
+    bildir('Geçerli bir dönüş KM girin', true);
+    return;
+  }
+
+  try {
+    await db.collection('kiralamalar').doc(kiralamaId).update({
+      donusKm, toplamKm, gunSayisi, asim, ekUcret: ucret,
+      iadeTarihi: bugun.toISOString().split('T')[0],
+      durum: 'tamamlandi'
+    });
+    
+    await db.collection('araclar').doc(aracId).update({ 
+      durum: 'musait', 
+      km: donusKm 
+    });
+    
+    bildir(`✅ İade alındı. Ek ücret: ${ucret.toLocaleString('tr-TR')} ₺`);
+    iadeModalKapat();
+    await araclariYukle();
+    await kiralamalariYukle();
+  } catch (err) {
+    console.error('İade hatası:', err);
+    bildir('❌ Hata: ' + err.message, true);
+  }
+}
+
+// KİRALAMALARI YÜKLE
+async function kiralamalariYukle() {
+  const liste = document.getElementById('kiralamaListesi');
+  liste.innerHTML = '<p style="color:#666;">Yükleniyor...</p>';
+  
+  try {
+    const snap = await db.collection('kiralamalar').orderBy('tarih', 'desc').get();
+    
+    if (snap.empty) {
+      liste.innerHTML = '<p style="color:#666;">Henüz kiralama yok.</p>';
+      return;
+    }
+    
+    liste.innerHTML = '';
+    snap.forEach(doc => {
+      const k = doc.data();
+      const div = document.createElement('div');
+      div.className = 'liste-item';
+      const durumClass = k.durum === 'kirada' ? 'durum-kirada' : 'durum-musait';
+      const durumText = k.durum === 'kirada' ? 'KİRADA' : 'TAMAMLANDI';
+      
+      div.innerHTML = `
+        <div class="bilgi">
+          <h3>${k.musteri} <span class="durum ${durumClass}">${durumText}</span></h3>
+          <p>📞 ${k.telefon}</p>
+          <p>📅 ${k.cikis} → ${k.iadeTarihi || k.iade}</p>
+          <p>🛣️ Çıkış: ${k.cikisKm.toLocaleString('tr-TR')} km${k.donusKm ? ' · Dönüş: ' + k.donusKm.toLocaleString('tr-TR') + ' km' : ''}</p>
+          ${k.toplamKm ? `<p>📊 Toplam: ${k.toplamKm} km (${k.gunSayisi} gün) · Aşım: ${k.asim} km</p>` : ''}
+          ${k.ekUcret ? `<p style="color:#c00;font-weight:700;">💰 Ek Ücret: ${k.ekUcret.toLocaleString('tr-TR')} ₺</p>` : ''}
+        </div>
+      `;
+      liste.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Kiralama yükleme hatası:', err);
+    liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>';
+  }
+}
+
+// RANDEVULARI YÜKLE
+async function randevulariYukle() {
+  const liste = document.getElementById('randevuListesi');
+  liste.innerHTML = '<p style="color:#666;">Yükleniyor...</p>';
+  
+  try {
+    const snap = await db.collection('randevular').orderBy('tarih', 'desc').get();
+    
+    if (snap.empty) {
+      liste.innerHTML = '<p style="color:#666;">Henüz randevu yok.</p>';
+      return;
+    }
+    
+    liste.innerHTML = '';
+    snap.forEach(doc => {
+      const r = doc.data();
+      const div = document.createElement('div');
+      div.className = 'liste-item';
+      const tip = r.tip === 'kiralama' ? '🚗 Kiralama' : '✨ Yıkama/Tamir';
+      
+      div.innerHTML = `
+        <div class="bilgi">
+          <h3>${r.ad || 'İsimsiz'} <small style="color:#C9A961;">${tip}</small></h3>
+          <p>📞 ${r.telefon || '-'}</p>
+          ${r.arac ? `<p>🚗 ${r.arac}</p>` : ''}
+          ${r.hizmet ? `<p>🔧 ${r.hizmet}</p>` : ''}
+          ${r.baslangic ? `<p>📅 ${r.baslangic} → ${r.bitis || '-'}</p>` : ''}
+          ${r.not ? `<p>📝 ${r.not}</p>` : ''}
+        </div>
+        <button class="sil-btn" onclick="randevuSil('${doc.id}')">Sil</button>
+      `;
+      liste.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Randevu yükleme hatası:', err);
+    liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>';
+  }
+}
+
+// RANDEVU SİL
+async function randevuSil(id) {
+  if (!confirm('Randevuyu sil?')) return;
+  
+  try {
+    await db.collection('randevular').doc(id).delete();
+    bildir('🗑️ Silindi');
+    await randevulariYukle();
+  } catch (err) {
+    console.error('Randevu silme hatası:', err);
+    bildir('❌ Silme hatası: ' + err.message, true);
+  }
 }
 </script>
-
 </body>
 </html>
