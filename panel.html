@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yönetici Paneli | Uzel Prestij Garaj</title>
+<meta name="theme-color" content="#C9A961">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #0A0A0A; }
@@ -182,6 +185,10 @@ body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #0A0A0A; }
 <script src="firebase-config.js"></script>
 
 <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
 const GUNLUK_LIMIT = 200;
 const ASIM_UCRETI = 5;
 
@@ -204,7 +211,6 @@ function bildir(mesaj, hata = false) {
   setTimeout(() => b.classList.remove('goster'), 3000);
 }
 
-// ARAÇ EKLE
 document.getElementById('aracForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('ekleBtn');
@@ -232,7 +238,6 @@ document.getElementById('aracForm').addEventListener('submit', async (e) => {
   btn.disabled = false; btn.textContent = 'Aracı Ekle';
 });
 
-// ARAÇLARI YÜKLE
 async function araclariYukle() {
   const liste = document.getElementById('aracListesi');
   try {
@@ -273,7 +278,6 @@ async function araclariYukle() {
   } catch (err) { liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>'; }
 }
 
-// KİRAYA VER MODAL
 function kiralaModalAc(aracId, mevcutKm) {
   document.getElementById('kiralaAracId').value = aracId;
   document.getElementById('k_cikis_km').value = mevcutKm || '';
@@ -310,7 +314,6 @@ async function aracKirala() {
   } catch (err) { bildir('❌ Hata: ' + err.message, true); }
 }
 
-// İADE AL MODAL
 async function iadeModalAc(aracId) {
   const kSnap = await db.collection('kiralamalar')
     .where('aracId', '==', aracId)
@@ -386,7 +389,6 @@ async function aracIadeAl() {
   } catch (err) { bildir('❌ Hata: ' + err.message, true); }
 }
 
-// KİRALAMALARI YÜKLE
 async function kiralamalariYukle() {
   const liste = document.getElementById('kiralamaListesi');
   try {
@@ -412,7 +414,6 @@ async function kiralamalariYukle() {
   } catch (err) { liste.innerHTML = '<p style="color:#c00;">Hata: ' + err.message + '</p>'; }
 }
 
-// RANDEVULARI YÜKLE
 async function randevulariYukle() {
   const liste = document.getElementById('randevuListesi');
   try {
