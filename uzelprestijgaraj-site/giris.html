@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0f1e">
+  <title>Yönetici Girişi | Uzel Prestij Garaj</title>
+  <link rel="icon" type="image/png" href="logo.icon.png">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, Arial, sans-serif;
+      background: #0a0f1e;
+      color: #111827;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      display: grid;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      place-items: center;
+      background: radial-gradient(ellipse at top, #182238 0, #0a0f1e 58%);
+    }
+
+    .login-card {
+      width: min(100%, 420px);
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      color: #111827;
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    h1 {
+      margin: 0 0 28px;
+      color: #111827;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      color: #111827;
+      font: inherit;
+    }
+
+    input:focus {
+      border-color: #d89a0b;
+      outline: 3px solid rgba(245, 158, 11, .18);
+    }
+
+    button {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 6px;
+      border: 0;
+      border-radius: 8px;
+      background: #f59e0b;
+      color: #111827;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover { background: #fbbf24; }
+    button:disabled { cursor: wait; opacity: .7; }
+
+    .forgot {
+      display: block;
+      margin-top: 20px;
+      color: #8a5a00;
+      font-size: .9rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .forgot:hover { text-decoration: underline; }
+
+    .message {
+      min-height: 1.25em;
+      margin: 16px 0 0;
+      color: #b42318;
+      font-size: .88rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .message.success { color: #167447; }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 30px 22px; }
+      .brand { font-size: .84rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card">
+    <div class="brand">
+      <img src="logo.icon.png" alt="">
+      <span>UZEL PRESTİJ GARAJ</span>
+    </div>
+    <h1>Yönetici Girişi</h1>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Şifre</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button id="loginButton" type="submit">GİRİŞ YAP</button>
+    </form>
+    <a class="forgot" id="forgotPassword" href="#">Şifremi unuttum</a>
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const auth = firebase.auth();
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('loginButton');
+    const forgotPassword = document.getElementById('forgotPassword');
+    const message = document.getElementById('message');
+
+    function showMessage(text, isSuccess) {
+      message.textContent = text;
+      message.classList.toggle('success', isSuccess);
+    }
+
+    function getAuthErrorMessage(error) {
+      switch (error.code) {
+        case 'auth/invalid-email':
+          return 'Lütfen geçerli bir e-posta adresi girin.';
+        case 'auth/too-many-requests':
+          return 'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.';
+        case 'auth/network-request-failed':
+          return 'Bağlantı kurulamadı. İnternet bağlantınızı kontrol edin.';
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          return 'E-posta veya şifre hatalı.';
+        default:
+          console.error('Firebase kimlik doğrulama hatası:', error);
+          return 'Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.';
+      }
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        localStorage.setItem('girisYapildi', 'true');
+        window.location.href = 'panel.html';
+      }
+    }, error => {
+      console.error('Firebase oturum durumu okunamadı:', error);
+      showMessage('Oturum kontrol edilemedi. Lütfen sayfayı yenileyin.', false);
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      showMessage('', false);
+      loginButton.disabled = true;
+
+      try {
+        await auth.signInWithEmailAndPassword(emailInput.value.trim(), passwordInput.value);
+        localStorage.setItem('girisYapildi', 'true');
+        window.location.href = 'panel.html';
+      } catch (error) {
+        showMessage(getAuthErrorMessage(error), false);
+      } finally {
+        loginButton.disabled = false;
+      }
+    });
+
+    forgotPassword.addEventListener('click', async event => {
+      event.preventDefault();
+      showMessage('', false);
+
+      if (!emailInput.value.trim()) {
+        emailInput.focus();
+        showMessage('Şifre sıfırlama bağlantısı için önce e-posta adresinizi girin.', false);
+        return;
+      }
+
+      try {
+        await auth.sendPasswordResetEmail(emailInput.value.trim());
+        showMessage('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.', true);
+      } catch (error) {
+        showMessage(getAuthErrorMessage(error), false);
+      }
+    });
+  </script>
+</body>
+</html>
