@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a0f1e">
   <title>Yönetici Girişi | Uzel Prestij Garaj</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
+  <script>
+    const client = new Appwrite.Client()
+      .setEndpoint('https://fra.cloud.appwrite.io/v1')
+      .setProject('6ada441b0024cad62064');
+    const account = new Appwrite.Account(client);
+  </script>
   <style>
     * { box-sizing: border-box; }
 
@@ -136,51 +139,39 @@
       <span>UZEL PRESTİJ GARAJ</span>
     </div>
     <h1>Yönetici Girişi</h1>
-    <div class="field">
-      <label for="email">E-posta</label>
-      <input id="email" type="email" autocomplete="username">
-    </div>
-    <div class="field">
-      <label for="password">Şifre</label>
-      <input id="password" type="password" autocomplete="current-password">
-    </div>
-    <button id="girisButon" type="button">GİRİŞ YAP</button>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input id="email" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Şifre</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button id="girisButon" type="submit">GİRİŞ YAP</button>
+    </form>
     <a id="sifremiUnuttum" href="#">Şifremi unuttum</a>
     <p id="mesaj" role="alert"></p>
   </main>
 
-  <script src="firebase-config.js"></script>
   <script>
-    {
-      const auth = firebase.auth();
-      
-      const girisButon = document.getElementById('girisButon');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      const mesaj = document.getElementById('mesaj');
-      
-      girisButon.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
-        if (!email || !password) {
-          mesaj.textContent = 'E-posta ve şifre gerekli.';
-          mesaj.style.display = 'block';
-          return;
-        }
-        
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          localStorage.setItem('girisYapildi', 'true');
-          window.location.href = 'panel.html';
-        } catch (error) {
-          console.error('Firebase giriş hatası:', error);
-          mesaj.textContent = 'Giriş başarısız. E-posta veya şifre hatalı.';
-          mesaj.style.display = 'block';
-        }
-      });
-    }
+    document.getElementById('loginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const button = document.getElementById('girisButon');
+      button.disabled = true;
+      try {
+        await account.createEmailPasswordSession(email, password);
+        localStorage.setItem('girisYapildi', 'true');
+        window.location.href = 'panel.html';
+      } catch (error) {
+        console.error('Giriş hatası:', error);
+        alert('E-posta veya şifre hatalı');
+      } finally {
+        button.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>

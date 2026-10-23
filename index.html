@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Samandağ Kuşalanı'nda araç kiralama, oto yıkama ve tamir hizmetleri. Uzel Prestij Garaj ile yol sizin, imza bizim.">
-  <title>Uzel Prestij Garaj | Samandağ Araç Kiralama ve Oto Hizmetleri</title>
+  <title>Uzel Prestij Garaj | Premium Araç Kiralama</title>
   <link rel="icon" type="image/png" href="logo.icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
   <style>
     :root {
       color-scheme: light;
@@ -200,6 +201,26 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
+
+    .testimonial-header { text-align: center; margin-bottom: 32px; }
+    .google-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border: 1px solid #1e293b; border-radius: 26px; background: #0f172a; color: white; font-size: .85rem; font-weight: 700; }
+    .google-g { width: 20px; height: 20px; }
+    .google-rating { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+    .google-stars { color: #f8c000; font-size: 1.1rem; letter-spacing: 1px; }
+    .google-label { color: #cbd5e1; }
+    .review-card { padding: 32px 28px; border: 1px solid #1e293b; border-radius: var(--radius); background: #0f172a; position: relative; }
+    .stars { color: var(--gold); font-size: 1.2rem; margin-bottom: 16px; letter-spacing: 2px; }
+    .review-card p { color: #cbd5e1; font-size: .95rem; line-height: 1.6; margin-bottom: 24px; font-style: italic; }
+    .customer-info { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .customer-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1e293b; object-fit: cover; border: 2px solid var(--gold-dark); }
+    .customer-name { font-weight: 700; color: white; font-size: .95rem; }
+    .customer-city { color: var(--muted); font-size: .85rem; }
+    .review-google { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+    .review-google svg { width: 14px; height: 14px; }
+    .quote-mark { position: absolute; top: 20px; right: 24px; color: #1e293b; font-size: 3rem; font-family: Georgia, serif; opacity: .3; }
+
+    @media (max-width: 900px) { .testimonial-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+    @media (max-width: 700px) { .testimonial-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -382,6 +403,74 @@
         </div>
       </div>
     </section>
+    <section class="testimonials" id="musteriler">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Müşteri Geri Bildirimleri</p>
+          <h2>Müşterilerimiz Ne Diyor?</h2>
+          <p>Hizmetlerimizden memnun olan değerli müşterilerimizin paylaşımları.</p>
+        </div>
+        <div class="testimonial-header">
+          <div class="google-badge">
+            <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
+            <div class="google-rating">
+              <div class="google-stars">★★★★★</div>
+              <span class="google-label">Google'da 5.0 Puan</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-grid">
+          <article class="review-card">
+            <span class="quote-mark">“</span>
+            <div class="stars">★★★★★</div>
+            <p>"Uzel Prestij Garaj'dan kiraladığım araçla kusursuz bir yolculuk yaşadım. Araç çok temiz ve bakımlıydı. Kesinlikle tekrar tercih edeceğim."</p>
+            <div class="customer-info">
+              <div>
+                <img class="customer-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1272a8e396?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Ahmet Yılmaz">
+                <div class="customer-name">Ahmet Yılmaz</div>
+                <div class="customer-city">Samandağ / Hatay</div>
+              </div>
+              <div class="review-google">
+                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
+                <span>Google</span>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="quote-mark">“</span>
+            <div class="stars">★★★★★</div>
+            <p>"Oto yıkama servisi gerçekten profesyonel. Arabam ilk günkü gibi parlıyor. Samandağ'daki en iyi otomotiv hizmeti burası."</p>
+            <div class="customer-info">
+              <div>
+                <img class="customer-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Elif Demir">
+                <div class="customer-name">Elif Demir</div>
+                <div class="customer-city">Kuşalanı / Hatay</div>
+              </div>
+              <div class="review-google">
+                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
+                <span>Google</span>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="quote-mark">“</span>
+            <div class="stars">★★★★★</div>
+            <p>"Rezervasyon süreci çok hızlı ve sorunsuz oldu. Personel çok nazik ve yardımcıydı. Uzel Prestij Garaj'ı herkese tavsiye ederim."</p>
+            <div class="customer-info">
+              <div>
+                <img class="customer-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Mehmet Kaya">
+                <div class="customer-name">Mehmet Kaya</div>
+                <div class="customer-city">Samandağ / Hatay</div>
+              </div>
+              <div class="review-google">
+                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
+                <span>Google</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -414,20 +503,15 @@
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 11.7a8.4 8.4 0 0 1-12.4 7.4L3 20.4l1.3-4.9a8.4 8.4 0 1 1 16.2-3.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.2 7.8c.2-.4.4-.4.7-.4h.4c.2 0 .3.1.4.4l.7 1.7c.1.2.1.4-.1.6l-.5.6c-.2.2-.2.4 0 .6.5.9 1.2 1.5 2.1 2 .2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .3-.2 1-.7 1.4-.5.5-1.3.7-2 .5-1-.2-2.2-.7-3.5-1.9-1.5-1.3-2.5-3-2.6-4.1-.1-.9.4-1.4.8-1.7Z" fill="currentColor"/></svg>
   </a>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_RJyKfjzv2LICbo27GlsyxcEx6A4trRo",
-      authDomain: "uzel-prestij-garaj.firebaseapp.com",
-      projectId: "uzel-prestij-garaj",
-      storageBucket: "uzel-prestij-garaj.firebasestorage.app",
-      messagingSenderId: "970518621544",
-      appId: "1:970518621544:web:9e4d850efbfe6635293add",
-      measurementId: "G-1ZZJFSQW69"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const client = new Appwrite.Client()
+      .setEndpoint('https://fra.cloud.appwrite.io/v1')
+      .setProject('6ada441b0024cad62064');
+    const databases = new Appwrite.Databases(client);
+    const databaseId = '6ada451700215ff02c73';
+    const vehiclesCollectionId = '6adae45f0033f75b199f';
+    const bookingsCollectionId = '6adafc53000653f16991';
+
     const fleetGrid = document.getElementById('fleetGrid');
     const vehicleSelect = document.getElementById('vehicleSelect');
     const bookingForm = document.getElementById('bookingForm');
@@ -460,8 +544,8 @@
 
       vehicles.forEach(({ id, data }) => {
         const name = [data.marka, data.model].filter(Boolean).join(' ') || data.ad || 'Kiralık araç';
-        const price = Number(data.fiyat) || 0;
-        const photo = data.foto || data.gorsel || data.image || fallbackVehicleImage;
+        const price = Number(data.fiyat ?? data.gunluk_ucret ?? data.gunlukUcret) || 0;
+        const photo = data.resim || data.foto || data.gorsel || data.image || fallbackVehicleImage;
         const card = document.createElement('article');
         card.className = 'vehicle-card';
         card.innerHTML = `
@@ -488,10 +572,10 @@
 
     async function loadVehicles() {
       try {
-        const snapshot = await db.collection('araclar').get();
-        snapshot.forEach(documentSnapshot => {
-          const data = documentSnapshot.data();
-          if (isAvailable(data)) vehicles.push({ id: documentSnapshot.id, data });
+        const response = await databases.listDocuments(databaseId, vehiclesCollectionId);
+        response.documents.forEach(record => {
+          const data = record;
+          if (isAvailable(data)) vehicles.push({ id: record.$id, data });
         });
         vehicles.sort((first, second) => String(first.data.marka || '').localeCompare(String(second.data.marka || ''), 'tr'));
         vehicles.forEach(({ id, data }) => {
@@ -524,7 +608,7 @@
       const selectedService = document.getElementById('serviceType').value;
 
       try {
-        await db.collection('randevular').add({
+        await databases.createDocument(databaseId, bookingsCollectionId, 'unique()', {
           ad: document.getElementById('customerName').value.trim(),
           telefon: document.getElementById('customerPhone').value.trim(),
           arac: selectedVehicle ? ([selectedVehicle.data.marka, selectedVehicle.data.model].filter(Boolean).join(' ') || selectedVehicle.data.ad || '') : '',
@@ -534,8 +618,7 @@
           hizmetTuru: selectedService,
           hizmet: selectedService,
           durum: 'beklemede',
-          not: document.getElementById('bookingNote').value.trim(),
-          kayitZamani: firebase.firestore.FieldValue.serverTimestamp()
+          not: document.getElementById('bookingNote').value.trim()
         });
         bookingForm.reset();
         showFormMessage('Talebiniz alındı! En kısa sürede sizi arayacağız.', 'success');

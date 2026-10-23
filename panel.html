@@ -5,9 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0f1e">
 <title>Yönetici Paneli | Uzel Prestij Garaj</title>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
 <script>
-  window.panelSessionAllowed = localStorage.getItem('girisYapildi') === 'true';
-  if (!window.panelSessionAllowed) window.location.href = 'giris.html';
+  const client = new Appwrite.Client()
+    .setEndpoint('https://fra.cloud.appwrite.io/v1')
+    .setProject('6ada441b0024cad62064');
+  const databases = new Appwrite.Databases(client);
+  const storage = new Appwrite.Storage(client);
+  const account = new Appwrite.Account(client);
+  const appwriteDatabaseId = '6ada451700215ff02c73';
+  const appwriteCollectionIds = {
+    araclar: '6adae45f0033f75b199f',
+    kiralamalar: '6adafcff002c257f2765',
+    randevular: '6adafc53000653f16991'
+  };
+  const authReady = (async () => {
+    try {
+      await account.get();
+      return true;
+    } catch (error) {
+      console.error('Appwrite oturumu doğrulanamadı:', error);
+      localStorage.removeItem('girisYapildi');
+      window.location.href = 'giris.html';
+      return false;
+    }
+  })();
 </script>
 <style>
 :root {
@@ -94,6 +116,12 @@ button { color: inherit; }
   color: #fda4af; background: rgba(251,113,133,.08);
 }
 .button-danger:hover { color: white; background: rgba(225,29,72,.72); }
+.button-success {
+  min-height: 34px; padding: 0 11px; border-color: rgba(34,197,94,.3);
+  color: #bbf7d0; background: rgba(34,197,94,.12);
+}
+.button-success:hover { color: white; background: rgba(22,163,74,.75); }
+.action-buttons { display: flex; flex-wrap: wrap; gap: 7px; }
 .dashboard { width: min(1440px,100%); margin: 0 auto; padding: 36px clamp(18px,5vw,72px) 64px; perspective: 1400px; }
 .heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 8px 0 25px; animation: fadeInUp .6s both; }
 .eyebrow { margin: 0 0 9px; color: var(--gold); font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
@@ -290,7 +318,10 @@ tbody tr:last-child td { border-bottom: 0; }
       <span class="brand-icon" aria-hidden="true">U</span>
       <span class="brand-copy"><strong>UZEL PRESTİJ GARAJ</strong><span>YÖNETİM MERKEZİ</span></span>
     </div>
-    <div class="top-actions"><span class="admin-badge">Yönetici</span><button class="button button-quiet" id="logout" type="button">Çıkış Yap</button></div>
+    <div class="top-actions">
+      <span class="admin-badge">Yönetici</span>
+      <button class="button button-quiet" id="logoutButton" type="button">Çıkış Yap</button>
+    </div>
   </header>
 
   <main class="dashboard">
@@ -328,14 +359,17 @@ tbody tr:last-child td { border-bottom: 0; }
         <form class="form-card" id="vehicleForm">
           <h3>Filoya araç ekle</h3>
           <div class="form-grid">
-            <div class="field"><label for="carModel">Marka / Model</label><input id="carModel" required placeholder="Fiat Egea"></div>
-            <div class="field"><label for="carYear">Yıl</label><input id="carYear" type="number" required min="1900" max="2100"></div>
-            <div class="field"><label for="carPrice">Günlük fiyat (₺)</label><input id="carPrice" type="number" required min="0"></div>
+            <div class="field"><label for="plaka">Plaka</label><input id="plaka" required placeholder="34 ABC 123"></div>
+            <div class="field"><label for="marka">Marka</label><input id="marka" required placeholder="Fiat"></div>
+            <div class="field"><label for="model">Model</label><input id="model" required placeholder="Egea"></div>
+            <div class="field"><label for="yil">Yıl</label><input id="yil" type="number" required min="1900" max="2100"></div>
+            <div class="field"><label for="gunluk_ucret">Günlük fiyat (₺)</label><input id="gunluk_ucret" type="number" required min="0"></div>
             <div class="field"><label for="carSeats">Koltuk sayısı</label><input id="carSeats" type="number" min="1" value="5"></div>
             <div class="field"><label for="carGear">Vites</label><select id="carGear"><option value="">Belirtilmedi</option><option>Manuel</option><option>Otomatik</option></select></div>
             <div class="field"><label for="carFuel">Yakıt</label><select id="carFuel"><option value="">Belirtilmedi</option><option>Benzin</option><option>Dizel</option><option>LPG</option><option>Elektrik</option><option>Hibrit</option></select></div>
-            <div class="field"><label for="carStatus">Durum</label><select id="carStatus"><option value="aktif">Aktif vitrinde</option><option value="pasif">Pasife alınmış</option></select></div>
+            <div class="field"><label for="durum">Durum</label><select id="durum"><option value="aktif">Aktif vitrinde</option><option value="pasif">Pasife alınmış</option></select></div>
             <div class="field"><label for="carImage">Görsel</label><input id="carImage" type="file" accept="image/*"></div>
+            <div class="field"><label for="carImageUrl">Görsel Linki (URL)</label><input id="carImageUrl" type="text" inputmode="url" placeholder="https://..."></div>
           </div>
           <div class="form-actions"><button class="button button-gold" id="saveVehicle" type="submit">Aracı Ekle</button></div>
         </form>
@@ -345,17 +379,16 @@ tbody tr:last-child td { border-bottom: 0; }
         <div class="section-title"><div><h2>Aktif kiralamalar</h2><p>Kiralamaları başlatın, teslim alın ve kilometre bilgilerini takip edin.</p></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>MÜŞTERİ</th><th>ARAÇ</th><th>BAŞLANGIÇ</th><th>BİTİŞ</th><th>GÜNLÜK ÜCRET</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
-            <tbody id="activeRentalRows"><tr><td colspan="7" class="empty">Kiralamalar yükleniyor...</td></tr></tbody>
+            <thead><tr><th>MÜŞTERİ</th><th>ARAÇ</th><th>TOPLAM ÜCRET</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
+            <tbody id="activeRentalRows"><tr><td colspan="5" class="empty">Kiralamalar yükleniyor...</td></tr></tbody>
           </table>
         </div>
-        <div class="form-actions"><button class="button button-gold" id="openRentalDialog" type="button">Kiraya Ver</button></div>
-
+        <div class="form-actions"><button class="button button-gold" id="openRentalDialog" type="button">Yeni kiralama</button></div>
         <form class="form-card" id="returnForm">
           <h3>Araç teslim al</h3>
           <div class="form-grid">
             <div class="field full"><label for="returnRental">Aktif kiralama</label><select id="returnRental" required><option value="">Kiralama seçin</option></select></div>
-            <div class="field"><label for="returnKm">Çıkış KM</label><input id="returnKm" type="number" min="0" step="1" required></div>
+            <div class="field"><label for="returnKm">Giriş KM</label><input id="returnKm" type="number" min="0" step="1" required></div>
             <div class="field"><label for="returnFuel">Yakıt durumu</label><select id="returnFuel" required><option value="">Seçin</option><option value="dolu">Dolu</option><option value="3/4">3/4</option><option value="1/2">1/2</option><option value="1/4">1/4</option><option value="bos">Boş</option></select></div>
             <div class="field full"><label for="returnDamage">Hasar notu</label><textarea id="returnDamage" rows="2" placeholder="Hasar yoksa boş bırakın"></textarea></div>
           </div>
@@ -401,7 +434,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <div class="field"><label for="rentalStart">Başlangıç tarihi</label><input id="rentalStart" type="date" required></div>
         <div class="field"><label for="rentalEnd">Bitiş tarihi</label><input id="rentalEnd" type="date" required></div>
         <div class="field"><label for="rentalDailyRate">Günlük ücret (₺)</label><input id="rentalDailyRate" type="number" min="0" step="0.01" required></div>
-        <div class="field"><label for="rentalEntryKm">Giriş KM</label><input id="rentalEntryKm" type="number" min="0" step="1" required></div>
+        <div class="field"><label for="rentalExitKm">Çıkış KM</label><input id="rentalExitKm" type="number" min="0" step="1" required></div>
         <div class="field"><label for="rentalTotal">Toplam ücret (₺)</label><input id="rentalTotal" type="number" readonly></div>
         <div class="field full"><label for="rentalNotes">Notlar</label><textarea id="rentalNotes" rows="2" placeholder="İsteğe bağlı"></textarea></div>
       </div>
@@ -412,28 +445,18 @@ tbody tr:last-child td { border-bottom: 0; }
 <div class="notice" id="notice" role="status" aria-live="polite"></div>
 
 <script>
-if (window.panelSessionAllowed) {
-  const firebaseScripts = [
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js'
-  ];
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_RJyKfjzv2lICbo27GlsyxcEx6A4trRo",
-    authDomain: "uzel-prestij-garaj.firebaseapp.com",
-    projectId: "uzel-prestij-garaj",
-    storageBucket: "uzel-prestij-garaj.firebasestorage.app",
-    messagingSenderId: "970518621544",
-    appId: "1:970518621544:web:9e4d850efbfe6635293add",
-    measurementId: "G-1ZZJFSQW69"
-  };
-
   const loading = document.getElementById('loading');
   const panel = document.getElementById('panel');
-  let auth;
-  let db;
-  let storage;
+  document.getElementById('logoutButton').addEventListener('click', async () => {
+    try {
+      await account.deleteSession('current');
+    } catch (error) {
+      console.error('Appwrite oturumu kapatılamadı:', error);
+    } finally {
+      localStorage.removeItem('girisYapildi');
+      window.location.href = 'giris.html';
+    }
+  });
   let noticeTimer;
   let vehicles = [];
   let bookings = [];
@@ -448,16 +471,6 @@ if (window.panelSessionAllowed) {
     noticeTimer = setTimeout(() => notice.classList.remove('show'), 3500);
   }
 
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = () => reject(new Error(`Firebase SDK yüklenemedi: ${src}`));
-      document.head.appendChild(script);
-    });
-  }
-
   function normalizeStatus(value, fallback = 'aktif') {
     if (value === false) return 'pasif';
     if (value === true) return 'aktif';
@@ -470,8 +483,12 @@ if (window.panelSessionAllowed) {
     return fallback;
   }
 
+  function isActiveRental(data) {
+    return ['aktif', 'kirada'].includes(String(data.durum ?? data.status ?? '').trim().toLocaleLowerCase('tr-TR'));
+  }
+
   function statusLabel(status) {
-    return ({ aktif: 'Aktif', pasif: 'Pasif', onaylandi: 'Onaylandı', beklemede: 'Beklemede', tamamlandi: 'Tamamlandı', iptal: 'İptal' })[status] || status;
+    return ({ aktif: 'Aktif', kirada: 'Kirada', pasif: 'Pasif', onaylandi: 'Onaylandı', beklemede: 'Beklemede', tamamlandi: 'Tamamlandı', iptal: 'İptal' })[status] || status;
   }
 
   function vehicleStatus(value) {
@@ -519,7 +536,7 @@ if (window.panelSessionAllowed) {
   function updateStats() {
     const passiveCount = vehicles.filter(({ data }) => data.aktif === false || data.vitrinde === false || normalizeStatus(data.durum ?? data.status) === 'pasif' || data.aktif === 'false').length;
     const activeCount = vehicles.length - passiveCount;
-    const activeRentals = rentals.filter(({ data }) => normalizeStatus(data.durum ?? data.status, 'beklemede') === 'aktif' || data.durum === 'kirada');
+    const activeRentals = rentals.filter(({ data }) => isActiveRental(data));
     const revenue = rentals.reduce((sum, { data }) => {
       const status = String(data.durum ?? data.status ?? '').toLocaleLowerCase('tr-TR');
       return status === 'iptal' ? sum : sum + numericAmount(data);
@@ -548,9 +565,13 @@ if (window.panelSessionAllowed) {
   }
 
   async function deleteRecord(collection, id, label) {
-    if (!window.confirm(`${label} kaydını silmek istediğinize emin misiniz?`)) return;
+    const collectionId = appwriteCollectionIds[collection];
+    if (!collectionId) {
+      showNotice(`${label} koleksiyon kimliği bulunamadı.`, true);
+      return;
+    }
     try {
-      await db.collection(collection).doc(id).delete();
+      await databases.deleteDocument(appwriteDatabaseId, collectionId, id);
       showNotice(`${label} silindi.`);
       await fetchData();
     } catch (error) {
@@ -561,7 +582,7 @@ if (window.panelSessionAllowed) {
 
   async function updateVehicleStatus(id, nextStatus, select) {
     try {
-      await db.collection('araclar').doc(id).update({ durum: nextStatus });
+      await databases.updateDocument(appwriteDatabaseId, appwriteCollectionIds.araclar, id, { durum: nextStatus });
       showNotice(`Araç durumu "${vehicleStatusLabel(nextStatus)}" olarak güncellendi.`);
       await fetchData();
     } catch (error) {
@@ -577,12 +598,12 @@ if (window.panelSessionAllowed) {
       .sort((a, b) => (dateValue(b.data.teslimAlmaTarihi || b.data.tarih || b.data.olusturmaTarihi)?.getTime() || 0) - (dateValue(a.data.teslimAlmaTarihi || a.data.tarih || a.data.olusturmaTarihi)?.getTime() || 0));
     const latest = relatedRentals[0]?.data || {};
     const entryValue = latest.girisKm ?? data.girisKm ?? data.kmGiris;
-    const exitValue = latest.girisKm !== undefined ? latest.cikisKm : (data.cikisKm ?? data.kmCikis);
+    const exitValue = latest.cikisKm ?? data.cikisKm ?? data.kmCikis;
     const entry = Number(entryValue);
     const exit = Number(exitValue);
     const hasEntry = entryValue !== undefined && entryValue !== null && Number.isFinite(entry) && entry >= 0;
     const hasExit = exitValue !== undefined && exitValue !== null && Number.isFinite(exit) && exit >= 0;
-    const difference = hasEntry && hasExit ? exit - entry : null;
+    const difference = hasEntry && hasExit ? entry - exit : null;
     return { entry: hasEntry ? entry : null, exit: hasExit ? exit : null, difference };
   }
 
@@ -595,12 +616,16 @@ if (window.panelSessionAllowed) {
       const row = tbody.insertRow();
       tableCell(row, id);
       const imageCell = row.insertCell();
-      if (data.foto || data.gorsel || data.image) {
+      if (data.resim || data.foto || data.gorsel || data.image) {
         const image = document.createElement('img');
         image.className = 'vehicle-image';
         image.loading = 'lazy';
         image.alt = data.marka || data.model || 'Araç';
-        image.src = data.foto || data.gorsel || data.image;
+        image.style.width = '50px';
+        image.style.height = '50px';
+        image.style.objectFit = 'cover';
+        image.style.borderRadius = '5px';
+        image.src = data.resim || data.foto || data.gorsel || data.image;
         imageCell.appendChild(image);
       } else {
         imageCell.textContent = '—';
@@ -609,7 +634,7 @@ if (window.panelSessionAllowed) {
       nameCell.className = 'name';
       nameCell.textContent = [data.marka, data.model].filter(Boolean).join(' ') || data.ad || 'İsimsiz araç';
       tableCell(row, data.yil);
-      tableCell(row, `${Number(data.fiyat || 0).toLocaleString('tr-TR')} ₺`, 'price');
+      tableCell(row, `${Number(data.fiyat ?? data.gunluk_ucret ?? data.gunlukUcret ?? 0).toLocaleString('tr-TR')} ₺`, 'price');
       const kmCell = row.insertCell();
       const km = odometerValues(id, data);
       kmCell.textContent = `Giriş: ${km.entry === null ? '—' : km.entry.toLocaleString('tr-TR')} · Çıkış: ${km.exit === null ? '—' : km.exit.toLocaleString('tr-TR')} · Fark: ${km.difference === null ? '—' : km.difference.toLocaleString('tr-TR')}`;
@@ -634,28 +659,37 @@ if (window.panelSessionAllowed) {
       statusSelect.addEventListener('change', () => updateVehicleStatus(id, statusSelect.value, statusSelect));
       statusCell.appendChild(statusSelect);
       const actions = row.insertCell();
+      const actionButtons = document.createElement('div');
+      actionButtons.className = 'action-buttons';
+      const rent = document.createElement('button');
+      rent.type = 'button';
+      rent.className = 'button button-success';
+      rent.textContent = 'Kirala';
+      rent.disabled = vehicleStatus(data.durum || data.aracDurumu) !== 'musait';
+      rent.setAttribute('aria-label', `${data.marka || data.model || 'Araç'} kirala`);
+      rent.addEventListener('click', () => openRentalForm({ id, data }));
+      actionButtons.appendChild(rent);
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'button button-danger';
       remove.textContent = 'Sil';
       remove.addEventListener('click', () => deleteRecord('araclar', id, 'Araç'));
-      actions.appendChild(remove);
+      actionButtons.appendChild(remove);
+      actions.appendChild(actionButtons);
     });
   }
 
   function renderRentals() {
     const tbody = document.getElementById('activeRentalRows');
     tbody.replaceChildren();
-    const active = rentals.filter(({ data }) => data.durum === 'aktif' || data.durum === 'kirada' || normalizeStatus(data.durum ?? data.status, 'beklemede') === 'aktif');
-    if (!active.length) return emptyTable(tbody, 7, 'Aktif kiralama yok.');
+    const active = rentals.filter(({ data }) => isActiveRental(data));
+    if (!active.length) return emptyTable(tbody, 5, 'Aktif kiralama yok.');
     active.forEach(({ id, data }) => {
       const row = tbody.insertRow();
-      tableCell(row, data.ad || data.musteri || '—', 'name');
+      tableCell(row, data.ad || data.musteri || data.musteriAdi || '—', 'name');
       tableCell(row, data.aracAdi || data.arac || '—');
-      tableCell(row, formatDate(data.baslangic));
-      tableCell(row, formatDate(data.bitis));
-      tableCell(row, `${Number(data.gunlukUcret || 0).toLocaleString('tr-TR')} ₺`, 'price');
-      row.insertCell().appendChild(statusBadge('aktif'));
+      tableCell(row, `${numericAmount(data).toLocaleString('tr-TR')} ₺`, 'price');
+      row.insertCell().appendChild(statusBadge('kirada'));
       const actions = row.insertCell();
       const returnButton = document.createElement('button');
       returnButton.type = 'button';
@@ -696,9 +730,15 @@ if (window.panelSessionAllowed) {
       statusSelect.value = status;
       statusSelect.addEventListener('change', async () => {
         const selectedStatus = statusSelect.value;
+        statusSelect.value = status;
+        statusSelect.disabled = true;
         try {
-          statusSelect.disabled = true;
-          await db.collection('randevular').doc(id).update({ durum: selectedStatus });
+          await databases.updateDocument(
+            appwriteDatabaseId,
+            appwriteCollectionIds.randevular,
+            id,
+            { durum: selectedStatus }
+          );
           showNotice('Rezervasyon durumu güncellendi.');
           await fetchData();
         } catch (error) {
@@ -736,8 +776,6 @@ if (window.panelSessionAllowed) {
 
   function openRentalFromBooking(booking) {
     const customer = booking.data.ad || booking.data.musteri || booking.data.musteriAdi || '';
-    const customerSelect = document.getElementById('rentalCustomer');
-    const vehicleSelect = document.getElementById('rentalVehicle');
     const vehicleName = booking.data.arac || booking.data.vehicle || '';
     const vehicle = vehicles.find(item =>
       item.id === (booking.data.aracId || booking.data.vehicleId) ||
@@ -745,31 +783,52 @@ if (window.panelSessionAllowed) {
       item.data.ad === vehicleName
     );
 
-    document.getElementById('rentalForm').reset();
-    customerSelect.value = customer;
+    if (!vehicle || vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) !== 'musait') {
+      showNotice('Rezervasyondaki araç bulunamadı veya şu anda müsait değil.', true);
+      return;
+    }
+
+    openRentalForm(vehicle, { ...booking.data, id: booking.id });
+  }
+
+  function openRentalForm(vehicle, bookingData = {}) {
+    const form = document.getElementById('rentalForm');
+    const vehicleSelect = document.getElementById('rentalVehicle');
+    const customerName = bookingData.ad || bookingData.musteri || bookingData.musteriAdi || '';
+    const customerSelect = document.getElementById('rentalCustomer');
+    form.reset();
+    refreshOperationalSelects();
+    if (customerName && ![...customerSelect.options].some(option => option.value === customerName)) {
+      const customerOption = document.createElement('option');
+      customerOption.value = customerName;
+      customerOption.textContent = customerName;
+      customerSelect.appendChild(customerOption);
+    }
+    customerSelect.value = customerName;
+
     if (vehicle) {
-      const vehicleOption = [...vehicleSelect.options].find(option => option.value === vehicle.id);
-      if (!vehicleOption) {
+      if (![...vehicleSelect.options].some(option => option.value === vehicle.id)) {
         const option = document.createElement('option');
         option.value = vehicle.id;
-        option.textContent = [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || vehicleName;
+        option.textContent = [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || vehicle.id;
         vehicleSelect.appendChild(option);
       }
       vehicleSelect.value = vehicle.id;
-      document.getElementById('rentalDailyRate').value = Number(vehicle.data.fiyat || booking.data.gunlukUcret || 0);
-      document.getElementById('rentalEntryKm').value = Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? 0);
-    } else {
-      vehicleSelect.value = '';
-      showNotice('Rezervasyondaki araç filosunda bulunamadı; kiralama formunda aracı seçin.', true);
+      document.getElementById('rentalDailyRate').value =
+        Number(vehicle.data.fiyat ?? vehicle.data.gunluk_ucret ?? vehicle.data.gunlukUcret ?? bookingData.gunlukUcret ?? 0);
+      document.getElementById('rentalExitKm').value =
+        Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? vehicle.data.kmGiris ?? 0);
     }
-
-    const startDate = inputDate(booking.data.baslangic || booking.data.tarih);
-    const endDate = inputDate(booking.data.bitis);
-    document.getElementById('rentalStart').value = startDate;
-    document.getElementById('rentalEnd').value = endDate;
-    document.getElementById('rentalNotes').value = booking.data.not || '';
-    updateRentalTotal();
-    document.getElementById('rentalDialogTitle').textContent = `Rezervasyonu kiralamaya dönüştür${customer ? ` · ${customer}` : ''}`;
+    document.getElementById('rentalStart').value = inputDate(bookingData.baslangic || bookingData.tarih);
+    document.getElementById('rentalEnd').value = inputDate(bookingData.bitis);
+    document.getElementById('rentalNotes').value = bookingData.not || '';
+    if (bookingData.toplamTutar ?? bookingData.toplamUcret) {
+      document.getElementById('rentalTotal').value = bookingData.toplamTutar ?? bookingData.toplamUcret;
+    } else {
+      updateRentalTotal();
+    }
+    document.getElementById('rentalDialogTitle').textContent =
+      bookingData.id ? `Rezervasyonu kiralamaya dönüştür${customerName ? ` · ${customerName}` : ''}` : 'Yeni kiralama';
     document.getElementById('rentalDialog').showModal();
   }
 
@@ -777,38 +836,162 @@ if (window.panelSessionAllowed) {
     document.getElementById('rentalForm').reset();
     document.getElementById('rentalTotal').value = '';
     document.getElementById('rentalDialogTitle').textContent = 'Yeni kiralama';
+    refreshOperationalSelects();
     document.getElementById('rentalDialog').showModal();
   });
   document.getElementById('closeRentalDialog').addEventListener('click', () => {
     document.getElementById('rentalDialog').close();
   });
 
-  async function fetchData() {
+  document.getElementById('rentalVehicle').addEventListener('change', () => {
+    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
+    if (!vehicle) return;
+    document.getElementById('rentalDailyRate').value =
+      Number(vehicle.data.fiyat ?? vehicle.data.gunluk_ucret ?? vehicle.data.gunlukUcret ?? 0);
+    document.getElementById('rentalExitKm').value =
+      Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? vehicle.data.kmGiris ?? 0);
+    updateRentalTotal();
+  });
+
+  function updateRentalTotal() {
+    const start = dateValue(document.getElementById('rentalStart').value);
+    const end = dateValue(document.getElementById('rentalEnd').value);
+    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
+    const days = start && end && end >= start ? Math.max(1, Math.ceil((end - start) / 86400000)) : 0;
+    document.getElementById('rentalTotal').value =
+      days && Number.isFinite(dailyRate) ? (days * dailyRate).toFixed(2) : '';
+  }
+
+  ['rentalStart', 'rentalEnd', 'rentalDailyRate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateRentalTotal);
+  });
+
+  document.getElementById('rentalForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = document.getElementById('saveRental');
+    const customerName = document.getElementById('rentalCustomer').value;
+    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
+    const customer = bookings.find(item =>
+      (item.data.ad || item.data.musteri || item.data.musteriAdi) === customerName
+    );
+    const start = document.getElementById('rentalStart').value;
+    const end = document.getElementById('rentalEnd').value;
+    const startDate = dateValue(start);
+    const endDate = dateValue(end);
+    const exitKm = Number(document.getElementById('rentalExitKm').value);
+    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
+    const total = Number(document.getElementById('rentalTotal').value);
+    if (!vehicle || vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) !== 'musait' ||
+        !customerName || !startDate || !endDate || endDate < startDate ||
+        !Number.isFinite(exitKm) || exitKm < 0 ||
+        !Number.isFinite(dailyRate) || dailyRate < 0 ||
+        !Number.isFinite(total) || total < 0) {
+      showNotice('Müşteri, müsait araç, tarih, çıkış KM ve ücret bilgilerini kontrol edin.', true);
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Kaydediliyor...';
+    try {
+      await databases.createDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.kiralamalar,
+        'unique()',
+        {
+          ad: customerName,
+          telefon: customer?.data.telefon || customer?.data.phone || '',
+          aracId: vehicle.id,
+          aracAdi: [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || '',
+          baslangic: start,
+          bitis: end,
+          gunlukUcret: dailyRate,
+          toplamUcret: total,
+          gunSayisi: Math.max(1, Math.ceil((endDate - startDate) / 86400000)),
+          cikisKm: exitKm,
+          not: document.getElementById('rentalNotes').value.trim(),
+          durum: 'aktif'
+        }
+      );
+      await databases.updateDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar,
+        vehicle.id,
+        { durum: 'kirada', cikisKm: exitKm }
+      );
+      form.reset();
+      document.getElementById('rentalTotal').value = '';
+      document.getElementById('rentalDialog').close();
+      showNotice('Kiralama kaydedildi.');
+      await fetchData();
+    } catch (error) {
+      console.error('Kiralama kaydedilemedi:', error);
+      showNotice(`Kiralama kaydedilemedi: ${error.message}`, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Kiraya Ver';
+    }
+  });
+
+  async function araclariYukle() {
     const vehicleRows = document.getElementById('vehicleRows');
+    try {
+      const response = await databases.listDocuments(
+        '6ada451700215ff02c73',
+        '6adae45f0033f75b199f'
+      );
+      const records = response.documents;
+      console.log('Gelen araçlar:', records);
+      vehicles = records.map(record => ({ id: record.$id, data: record }));
+      renderVehicles();
+    } catch (error) {
+      console.error('Araçlar yüklenirken hata:', error);
+      vehicles = [];
+      emptyTable(vehicleRows, 8, `Araçlar yüklenemedi: ${error.message}`, true);
+    }
+  }
+
+  async function kiralamalariYukle() {
+    const rentalRows = document.getElementById('activeRentalRows');
+    try {
+      const response = await databases.listDocuments(
+        appwriteDatabaseId,
+        appwriteCollectionIds.kiralamalar
+      );
+      rentals = response.documents.map(record => ({ id: record.$id, data: record }));
+      renderRentals();
+    } catch (error) {
+      console.error('Kiralamalar yüklenemedi:', error);
+      rentals = [];
+      emptyTable(rentalRows, 5, `Kiralamalar yüklenemedi: ${error.message}`, true);
+    }
+  }
+
+  async function randevulariYukle() {
     const bookingRows = document.getElementById('bookingRows');
     try {
-      const [vehicleSnapshot, bookingSnapshot] = await Promise.all([
-        db.collection('araclar').get(),
-        db.collection('randevular').get()
-      ]);
-      const rentalSnapshot = await db.collection('kiralamalar').get();
-      vehicles = vehicleSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-      bookings = bookingSnapshot.docs
-        .map(doc => ({ id: doc.id, data: doc.data() }))
-        .sort((a, b) => (dateValue(b.data.tarih || b.data.baslangic)?.getTime() || 0) - (dateValue(a.data.tarih || a.data.baslangic)?.getTime() || 0));
-      rentals = rentalSnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-      renderVehicles();
+      const response = await databases.listDocuments(
+        appwriteDatabaseId,
+        appwriteCollectionIds.randevular
+      );
+      bookings = response.documents
+        .map(record => ({ id: record.$id, data: record }))
+        .sort((a, b) =>
+          (dateValue(b.data.tarih || b.data.baslangic)?.getTime() || 0) -
+          (dateValue(a.data.tarih || a.data.baslangic)?.getTime() || 0)
+        );
       renderBookings();
-      renderRentals();
-      refreshOperationalSelects();
-      updateStats();
     } catch (error) {
-      console.error('Firestore verileri yüklenemedi:', error);
-      emptyTable(vehicleRows, 8, `Araçlar yüklenemedi: ${error.message}`, true);
+      console.error('Randevular yüklenemedi:', error);
+      bookings = [];
       emptyTable(bookingRows, 7, `Randevular yüklenemedi: ${error.message}`, true);
-      emptyTable(document.getElementById('activeRentalRows'), 7, `Kiralamalar yüklenemedi: ${error.message}`, true);
-      showNotice(`Veriler yüklenemedi: ${error.message}`, true);
     }
+  }
+
+  async function fetchData() {
+    await Promise.all([araclariYukle(), kiralamalariYukle(), randevulariYukle()]);
+    refreshOperationalSelects();
+    updateStats();
   }
 
   function selectTab(tab) {
@@ -830,15 +1013,10 @@ if (window.panelSessionAllowed) {
   document.getElementById('addVehicleShortcut').addEventListener('click', () => {
     selectTab('vehicles');
     document.getElementById('vehicleForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    document.getElementById('carModel').focus({ preventScroll: true });
+    document.getElementById('marka').focus({ preventScroll: true });
   });
 
   function refreshOperationalSelects() {
-    const customerOptions = new Map();
-    [...bookings, ...rentals].forEach(({ data }) => {
-      const name = data.ad || data.musteri || data.musteriAdi;
-      if (name && !customerOptions.has(name)) customerOptions.set(name, { value: name, label: name });
-    });
     const addOptions = (select, options, placeholder, selected = '') => {
       select.replaceChildren();
       const initial = document.createElement('option');
@@ -859,18 +1037,26 @@ if (window.panelSessionAllowed) {
       label: [data.marka, data.model].filter(Boolean).join(' ') || data.ad || id,
       disabled: vehicleStatus(data.durum || data.aracDurumu) !== 'musait' || data.aktif === false || data.vitrinde === false || data.aktif === 'false'
     }));
+    const customerOptions = new Map();
+    [...bookings, ...rentals].forEach(({ data }) => {
+      const name = data.ad || data.musteri || data.musteriAdi;
+      if (name && !customerOptions.has(name)) customerOptions.set(name, { value: name, label: name });
+    });
+    const rentalCustomerSelect = document.getElementById('rentalCustomer');
+    const selectedRentalCustomer = rentalCustomerSelect.value;
+    addOptions(rentalCustomerSelect, [...customerOptions.values()], 'Müşteri seçin', selectedRentalCustomer);
     const rentalVehicleSelect = document.getElementById('rentalVehicle');
     const selectedRentalVehicle = rentalVehicleSelect.value;
+    addOptions(rentalVehicleSelect, vehicleOptions.filter(option => !option.disabled), 'Müsait araç seçin', selectedRentalVehicle);
+
     const bookingVehicleSelect = document.getElementById('bookingVehicle');
     const selectedBookingVehicle = bookingVehicleSelect.value;
-    addOptions(document.getElementById('rentalCustomer'), [...customerOptions.values()], 'Müşteri seçin');
-    addOptions(rentalVehicleSelect, vehicleOptions.filter(option => !option.disabled), 'Müsait araç seçin', selectedRentalVehicle);
     addOptions(bookingVehicleSelect, vehicleOptions, 'Araç seçin', selectedBookingVehicle);
 
     const activeRentalSelect = document.getElementById('returnRental');
     const selectedRental = activeRentalSelect.value;
     const activeOptions = rentals
-      .filter(({ data }) => data.durum === 'kirada' || normalizeStatus(data.durum ?? data.status, 'beklemede') === 'aktif')
+      .filter(({ data }) => isActiveRental(data))
       .map(({ id, data }) => ({
         value: id,
         label: `${data.ad || data.musteri || 'Müşteri'} — ${data.aracAdi || data.arac || 'Araç'} (${formatDate(data.baslangic)})`
@@ -883,110 +1069,53 @@ if (window.panelSessionAllowed) {
     const end = dateValue(document.getElementById('rentalEnd').value);
     const dailyRate = Number(document.getElementById('rentalDailyRate').value);
     const days = start && end && end >= start ? Math.max(1, Math.ceil((end - start) / 86400000)) : 0;
-    document.getElementById('rentalTotal').value = days && Number.isFinite(dailyRate) ? (days * dailyRate).toFixed(2) : '';
+    document.getElementById('rentalTotal').value =
+      days && Number.isFinite(dailyRate) ? (days * dailyRate).toFixed(2) : '';
   }
 
   ['rentalStart', 'rentalEnd', 'rentalDailyRate'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateRentalTotal);
   });
-  document.getElementById('rentalVehicle').addEventListener('change', () => {
-    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
-    if (!vehicle) return;
-    document.getElementById('rentalDailyRate').value = Number(vehicle.data.fiyat || 0);
-    document.getElementById('rentalEntryKm').value = Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? 0);
-    updateRentalTotal();
-  });
-
-  document.getElementById('rentalForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const button = document.getElementById('saveRental');
-    const customerName = document.getElementById('rentalCustomer').value;
-    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
-    const customer = bookings.find(item => (item.data.ad || item.data.musteri || item.data.musteriAdi) === customerName);
-    const start = document.getElementById('rentalStart').value;
-    const end = document.getElementById('rentalEnd').value;
-    const startDate = dateValue(start);
-    const endDate = dateValue(end);
-    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
-    const entryKm = Number(document.getElementById('rentalEntryKm').value);
-    if (!customerName || !vehicle || vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) !== 'musait' ||
-        !startDate || !endDate || endDate < startDate ||
-        !Number.isFinite(dailyRate) || dailyRate < 0 || !Number.isFinite(entryKm) || entryKm < 0) {
-      showNotice('Müşteri, müsait araç, tarih, ücret ve giriş KM bilgilerini kontrol edin.', true);
-      return;
-    }
-    const days = Math.max(1, Math.ceil((endDate - startDate) / 86400000));
-    button.disabled = true;
-    button.textContent = 'Kaydediliyor...';
-    try {
-      const rentalRef = db.collection('kiralamalar').doc();
-      const batch = db.batch();
-      batch.set(rentalRef, {
-        ad: customerName,
-        telefon: customer?.data.telefon || customer?.data.phone || '',
-        aracId: vehicle.id,
-        aracAdi: [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || '',
-        baslangic: start,
-        bitis: end,
-        gunlukUcret: dailyRate,
-        toplamUcret: dailyRate * days,
-        gunSayisi: days,
-        girisKm: entryKm,
-        not: document.getElementById('rentalNotes').value.trim(),
-        durum: 'aktif',
-        tarih: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      batch.update(db.collection('araclar').doc(vehicle.id), { durum: 'kirada', girisKm: entryKm });
-      await batch.commit();
-      form.reset();
-      document.getElementById('rentalTotal').value = '';
-      document.getElementById('rentalDialog').close();
-      showNotice('Kiralama kaydedildi.');
-      await fetchData();
-    } catch (error) {
-      console.error('Kiralama kaydedilemedi:', error);
-      showNotice(`Kiralama kaydedilemedi: ${error.message}`, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = 'Kiraya Ver';
-    }
-  });
 
   document.getElementById('returnForm').addEventListener('submit', async event => {
     event.preventDefault();
-    const form = event.currentTarget;
     const button = document.getElementById('saveReturn');
     const rentalId = document.getElementById('returnRental').value;
     const rental = rentals.find(item => item.id === rentalId);
-    const exitKm = Number(document.getElementById('returnKm').value);
-    if (!rental || !Number.isFinite(exitKm) || exitKm < Number(rental.data.girisKm || 0)) {
-      showNotice('Aktif kiralamayı ve giriş KM değerinden düşük olmayan çıkış KM bilgisini kontrol edin.', true);
+    const entryKm = Number(document.getElementById('returnKm').value);
+    if (!rental || !Number.isFinite(entryKm) || entryKm < Number(rental.data.cikisKm || 0)) {
+      showNotice('Aktif kiralamayı ve çıkış KM değerinden düşük olmayan giriş KM bilgisini kontrol edin.', true);
       return;
     }
     button.disabled = true;
     button.textContent = 'Kaydediliyor...';
     try {
-      const batch = db.batch();
-      batch.update(db.collection('kiralamalar').doc(rentalId), {
-        durum: 'tamamlandi',
-        cikisKm: exitKm,
-        yakitDurumu: document.getElementById('returnFuel').value,
-        hasarNotu: document.getElementById('returnDamage').value.trim(),
-        teslimAlmaTarihi: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await databases.updateDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.kiralamalar,
+        rentalId,
+        {
+          durum: 'tamamlandi',
+          girisKm: entryKm,
+          yakitDurumu: document.getElementById('returnFuel').value,
+          hasarNotu: document.getElementById('returnDamage').value.trim()
+        }
+      );
       const vehicleId = rental.data.aracId || rental.data.vehicleId;
       if (vehicleId) {
-        batch.update(db.collection('araclar').doc(vehicleId), {
-          durum: 'musait',
-          girisKm: Number(rental.data.girisKm) || 0,
-          cikisKm: exitKm
-        });
+        await databases.updateDocument(
+          appwriteDatabaseId,
+          appwriteCollectionIds.araclar,
+          vehicleId,
+          {
+            durum: 'musait',
+            girisKm: entryKm,
+            cikisKm: Number(rental.data.cikisKm) || 0
+          }
+        );
       }
-      await batch.commit();
-      form.reset();
-      showNotice('Araç teslim alındı ve kiralama tamamlandı.');
       await fetchData();
+      showNotice('Araç teslim alındı.');
     } catch (error) {
       console.error('Araç teslim alınamadı:', error);
       showNotice(`Araç teslim alınamadı: ${error.message}`, true);
@@ -996,42 +1125,47 @@ if (window.panelSessionAllowed) {
     }
   });
 
-  document.getElementById('vehicleForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    const form = event.currentTarget;
+  const form = document.getElementById('vehicleForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
     const button = document.getElementById('saveVehicle');
-    const imageFile = document.getElementById('carImage').files[0];
     button.disabled = true;
-    button.textContent = 'Kaydediliyor...';
     try {
-      let imageUrl = '';
-      if (imageFile) {
-        const imageRef = storage.ref(`araclar/${Date.now()}_${imageFile.name}`);
-        await imageRef.put(imageFile);
-        imageUrl = await imageRef.getDownloadURL();
+      const file = document.getElementById('carImage').files[0];
+      const imageUrl = document.getElementById('carImageUrl').value.trim();
+      let resimUrl = '';
+      if (file) {
+        const uploadedFile = await storage.createFile('6adb0003003baa487610', 'unique()', file);
+        resimUrl = `${client.config.endpoint}/storage/buckets/6adb0003003baa487610/files/${uploadedFile.$id}/view?project=${client.config.project}`;
+      } else if (imageUrl) {
+        resimUrl = imageUrl;
       }
-      await db.collection('araclar').add({
-        marka: document.getElementById('carModel').value.trim(),
-        yil: Number(document.getElementById('carYear').value),
-        fiyat: Number(document.getElementById('carPrice').value),
-        koltuk: Number(document.getElementById('carSeats').value) || 5,
-        vites: document.getElementById('carGear').value,
-        yakit: document.getElementById('carFuel').value,
-        foto: imageUrl,
-        durum: document.getElementById('carStatus').value,
-        aktif: document.getElementById('carStatus').value === 'aktif',
-        tarih: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await databases.createDocument(
+        '6ada451700215ff02c73',
+        '6adae45f0033f75b199f',
+        'unique()',
+        {
+          plaka: document.getElementById('plaka').value,
+          marka: document.getElementById('marka').value,
+          model: document.getElementById('model').value,
+          yil: parseInt(document.getElementById('yil').value, 10),
+          gunluk_ucret: parseFloat(document.getElementById('gunluk_ucret').value),
+          durum: document.getElementById('durum').value,
+          resim: resimUrl
+        },
+        [
+          Appwrite.Permission.write(Appwrite.Role.any()),
+          Appwrite.Permission.read(Appwrite.Role.any())
+        ]
+      );
       form.reset();
-      document.getElementById('carSeats').value = 5;
-      showNotice('Araç kaydedildi.');
-      await fetchData();
+      showNotice('Araç başarıyla eklendi.');
+      await araclariYukle();
     } catch (error) {
-      console.error('Araç kaydedilemedi:', error);
-      showNotice(`Araç kaydedilemedi: ${error.message}`, true);
+      console.error('Araç eklenemedi:', error);
+      showNotice(`Araç eklenemedi: ${error.message}`, true);
     } finally {
       button.disabled = false;
-      button.textContent = 'Aracı Ekle';
     }
   });
 
@@ -1044,21 +1178,28 @@ if (window.panelSessionAllowed) {
     try {
       const selectedVehicle = vehicles.find(item => item.id === document.getElementById('bookingVehicle').value);
       const selectedService = document.getElementById('bookingService').value;
-      await db.collection('randevular').add({
-        ad: document.getElementById('bookingName').value.trim(),
-        telefon: document.getElementById('bookingPhone').value.trim(),
-        arac: selectedVehicle ? ([selectedVehicle.data.marka, selectedVehicle.data.model].filter(Boolean).join(' ') || selectedVehicle.data.ad || '') : '',
-        aracId: selectedVehicle?.id || '',
-        tarih: document.getElementById('bookingDate').value,
-        baslangic: document.getElementById('bookingDate').value,
-        bitis: document.getElementById('bookingEnd').value,
-        hizmetTuru: selectedService,
-        hizmet: selectedService,
-        durum: document.getElementById('bookingStatus').value,
-        toplamTutar: Number(document.getElementById('bookingAmount').value) || 0,
-        not: '',
-        kayitZamani: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      const date = document.getElementById('bookingDate').value;
+      await databases.createDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.randevular,
+        'unique()',
+        {
+          ad: document.getElementById('bookingName').value.trim(),
+          telefon: document.getElementById('bookingPhone').value.trim(),
+          arac: selectedVehicle
+            ? ([selectedVehicle.data.marka, selectedVehicle.data.model].filter(Boolean).join(' ') || selectedVehicle.data.ad || '')
+            : '',
+          aracId: selectedVehicle?.id || '',
+          tarih: date,
+          baslangic: date,
+          bitis: document.getElementById('bookingEnd').value,
+          hizmetTuru: selectedService,
+          hizmet: selectedService,
+          durum: document.getElementById('bookingStatus').value,
+          toplamTutar: Number(document.getElementById('bookingAmount').value) || 0,
+          not: ''
+        }
+      );
       form.reset();
       showNotice('Randevu kaydedildi.');
       await fetchData();
@@ -1071,46 +1212,17 @@ if (window.panelSessionAllowed) {
     }
   });
 
-  document.getElementById('logout').addEventListener('click', async () => {
-    localStorage.removeItem('girisYapildi');
-    try {
-      await auth.signOut();
-    } catch (error) {
-      console.error('Firebase oturumu kapatılamadı:', error);
-      showNotice(`Oturum kapatılamadı: ${error.message}`, true);
-    } finally {
-      window.location.href = 'giris.html';
-    }
-  });
-
   (async function startPanel() {
     try {
-      for (const src of firebaseScripts) await loadScript(src);
-      firebase.initializeApp(firebaseConfig);
-      auth = firebase.auth();
-      db = firebase.firestore();
-      storage = firebase.storage();
-
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          loading.hidden = true;
-          panel.hidden = false;
-          fetchData();
-          return;
-        }
-        if (localStorage.getItem('girisYapildi') !== 'true') {
-          window.location.href = 'giris.html';
-        }
-      }, error => {
-        console.error('Firebase oturum durumu okunamadı:', error);
-        loading.querySelector('span').textContent = 'Oturum kontrol edilemedi. Sayfayı yenileyin.';
-      });
+      if (!await authReady) return;
+      loading.hidden = true;
+      panel.hidden = false;
+      await fetchData();
     } catch (error) {
       console.error('Panel başlatılamadı:', error);
       loading.querySelector('span').textContent = `Panel başlatılamadı: ${error.message}`;
     }
   })();
-}
 </script>
 </body>
 </html>
