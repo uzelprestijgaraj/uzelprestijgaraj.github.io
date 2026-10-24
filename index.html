@@ -608,7 +608,7 @@
       const selectedService = document.getElementById('serviceType').value;
 
       try {
-        await databases.createDocument(databaseId, bookingsCollectionId, 'unique()', {
+        await databases.createDocument(databaseId, bookingsCollectionId, Appwrite.ID.unique(), {
           musteri_adi: document.getElementById('customerName').value.trim(),
           telefon: document.getElementById('customerPhone').value.trim(),
           arac_plaka: selectedVehicle ? selectedVehicle.data.plaka || '' : '',

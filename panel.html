@@ -780,25 +780,23 @@ tbody tr:last-child td { border-bottom: 0; }
       convert.type = 'button';
       convert.className = 'button button-gold';
       convert.textContent = 'Kiralamaya Dönüştür';
-      convert.addEventListener('click', async () => {
-        convert.disabled = true;
-        convert.textContent = 'Dönüştürülüyor...';
-        let rentalCreated = false;
-        try {
-          rentalCreated = await kiralamayaDonustur(
-            id,
-            data.musteri_adi,
-            data.telefon || '',
-            data.arac_plaka || '',
-            data.baslangic_tarihi || data.baslangic || data.tarih || '',
-            data.bitis_tarihi || data.bitis || ''
-          );
-        } finally {
-          convert.disabled = rentalCreated;
-          convert.textContent = rentalCreated ? 'Kiralama oluşturuldu' : 'Kiralamaya Dönüştür';
-        }
-      });
-      actions.appendChild(convert);
+      const service = String(data.hizmetTuru || data.hizmetTuruAdi || data.servis || data.hizmet || 'Kiralama')
+        .trim()
+        .toLocaleLowerCase('tr-TR');
+      if (service === 'kiralama' && data.arac_plaka) {
+        convert.addEventListener('click', async () => {
+          convert.disabled = true;
+          convert.textContent = 'Dönüştürülüyor...';
+          let rentalCreated = false;
+          try {
+            rentalCreated = await kiralamayaDonustur(id, data);
+          } finally {
+            convert.disabled = rentalCreated;
+            convert.textContent = rentalCreated ? 'Kiralama oluşturuldu' : 'Kiralamaya Dönüştür';
+          }
+        });
+        actions.appendChild(convert);
+      }
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'button button-danger';
@@ -822,7 +820,24 @@ tbody tr:last-child td { border-bottom: 0; }
     return date ? `${date}T00:00:00.000Z` : '';
   }
 
-  async function kiralamayaDonustur(randevuId, musteriAdi, telefon, aracPlaka, baslangicTarihi, bitisTarihi) {
+  async function kiralamayaDonustur(randevuId, booking) {
+    const musteriAdi = booking.musteri_adi || '';
+    const telefon = booking.telefon || booking.phone || '';
+    const aracPlaka = booking.arac_plaka || '';
+    const randevuTarihi = booking.tarih || booking.baslangic_tarihi || booking.baslangic || '';
+    const toplamUcretRaw = booking.toplam_ucret ?? booking.toplamUcret ?? booking.toplamTutar ??
+      booking.tutar ?? booking.toplamFiyat ?? booking.ucret ?? booking.fiyat;
+    const toplamUcretText = toplamUcretRaw === null || toplamUcretRaw === undefined
+      ? ''
+      : String(toplamUcretRaw).trim();
+    const toplamUcret = Number(toplamUcretText);
+
+    if (!inputDate(randevuTarihi) || !dateValue(randevuTarihi) ||
+        !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret < 0) {
+      showNotice('Randevuda geçerli bir tarih ve toplam ücret bulunmalıdır.', true);
+      return false;
+    }
+
     const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
     if (!vehicle) {
       showNotice('Randevudaki plaka için müsait bir araç bulunamadı.', true);
@@ -830,6 +845,7 @@ tbody tr:last-child td { border-bottom: 0; }
     }
 
     let rentalCreated = false;
+    let bookingDeleted = false;
     try {
       const currentVehicle = await getAvailableVehicle(vehicle.id);
       if (!currentVehicle) return false;
@@ -840,39 +856,40 @@ tbody tr:last-child td { border-bottom: 0; }
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
-        'unique()',
+        Appwrite.ID.unique(),
         {
           musteri_adi: musteriAdi,
           telefon,
           arac_plaka: aracPlaka,
-          cikis_km: 0,
-          giris_km: 0,
-          toplam_ucret: 0,
+          baslangic_tarihi: appwriteDate(randevuTarihi),
+          bitis_tarihi: appwriteDate(randevuTarihi),
+          toplam_ucret: toplamUcret,
           durum: 'Kirada',
-          baslangic_tarihi: appwriteDate(baslangicTarihi),
-          bitis_tarihi: appwriteDate(bitisTarihi || baslangicTarihi)
         }
       );
       rentalCreated = true;
+      await databases.deleteDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.randevular,
+        randevuId
+      );
+      bookingDeleted = true;
       await databases.updateDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.araclar,
         vehicle.id,
         { durum: 'kirada' }
       );
-      await databases.deleteDocument(
-        appwriteDatabaseId,
-        appwriteCollectionIds.randevular,
-        randevuId
-      );
       await fetchData();
       showNotice('Kiralama oluşturuldu ve randevu silindi.');
       return true;
     } catch (error) {
       console.error('Kiralamaya dönüştürme hatası:', error);
-      const partialMessage = rentalCreated
-        ? ' Kiralama kaydı oluşturuldu; yinelenen kayıt oluşturmadan paneli kontrol edin.'
-        : '';
+      const partialMessage = !rentalCreated
+        ? ''
+        : bookingDeleted
+          ? ' Kiralama kaydı oluşturuldu ve randevu silindi; araç durumu güncellenemedi. Yinelenen kayıt oluşturmadan paneli kontrol edin.'
+          : ' Kiralama kaydı oluşturuldu; randevu silinemedi. Yinelenen kayıt oluşturmadan paneli kontrol edin.';
       showNotice(`Dönüştürme başarısız: ${error.message}.${partialMessage}`, true);
       return rentalCreated;
     }
@@ -936,7 +953,7 @@ tbody tr:last-child td { border-bottom: 0; }
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
-        'unique()',
+        Appwrite.ID.unique(),
         {
           musteri_adi: customerName,
           telefon: phone,
@@ -1139,7 +1156,7 @@ tbody tr:last-child td { border-bottom: 0; }
       const imageUrl = document.getElementById('carImageUrl').value.trim();
       let resimUrl = '';
       if (file) {
-        const uploadedFile = await storage.createFile(appwriteImageBucketId, 'unique()', file);
+        const uploadedFile = await storage.createFile(appwriteImageBucketId, Appwrite.ID.unique(), file);
         resimUrl = storage.getFileView(appwriteImageBucketId, uploadedFile.$id).toString();
       } else if (imageUrl) {
         resimUrl = imageUrl;
@@ -1147,7 +1164,7 @@ tbody tr:last-child td { border-bottom: 0; }
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.araclar,
-        'unique()',
+        Appwrite.ID.unique(),
         {
           plaka: document.getElementById('plaka').value,
           marka: document.getElementById('marka').value,
@@ -1194,17 +1211,24 @@ tbody tr:last-child td { border-bottom: 0; }
       if (selectedVehicle && !currentVehicle) return;
       const selectedService = document.getElementById('bookingService').value;
       const date = document.getElementById('bookingDate').value;
+      const totalAmount = document.getElementById('bookingAmount').value.trim();
+      const amount = totalAmount === '' ? null : Number(totalAmount);
+      if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
+        showNotice('Randevu tutarı sıfır veya daha büyük bir sayı olmalıdır.', true);
+        return;
+      }
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.randevular,
-        'unique()',
+        Appwrite.ID.unique(),
         {
           musteri_adi: document.getElementById('bookingName').value.trim(),
           telefon: document.getElementById('bookingPhone').value.trim(),
           arac_plaka: currentVehicle ? currentVehicle.plaka || '' : '',
           tarih: date,
           hizmet: selectedService,
-          durum: document.getElementById('bookingStatus').value
+          durum: document.getElementById('bookingStatus').value,
+          ...(amount === null ? {} : { toplam_ucret: amount })
         }
       );
       form.reset();
