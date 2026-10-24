@@ -1,648 +1,1063 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="Samandağ Kuşalanı'nda araç kiralama, oto yıkama ve tamir hizmetleri. Uzel Prestij Garaj ile yol sizin, imza bizim.">
-  <title>Uzel Prestij Garaj | Premium Araç Kiralama</title>
-  <link rel="icon" type="image/png" href="logo.icon.png">
+  <meta name="theme-color" content="#0a0f1e">
+  <meta name="description" content="Uzel Prestij Garaj — Samandağ Kuşalanı'nda prestijli araç kiralama, oto yıkama ve tamir hizmetleri. Ücretsiz araç alım-teslim.">
+  <title>Uzel Prestij Garaj | Yol Sizin. İmza Bizim.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://images.unsplash.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
   <style>
     :root {
-      color-scheme: light;
-      --navy: #0f172a;
-      --muted: #64748b;
-      --gold: #f59e0b;
-      --gold-dark: #d97706;
-      --line: #e2e8f0;
-      --soft: #f8fafc;
-      --radius: 12px;
-      font-family: Inter, Arial, sans-serif;
-      font-synthesis: none;
-      text-rendering: optimizeLegibility;
+      color-scheme: dark;
+      --bg: #0a0f1e;
+      --panel: #1e293b;
+      --panel-glass: rgba(30, 41, 59, .68);
+      --gold: #fbbf24;
+      --amber: #f59e0b;
+      --white: #f8fafc;
+      --muted: #a6b2c5;
+      --line: rgba(255,255,255,.12);
+      --font: "Plus Jakarta Sans", sans-serif;
+      font-family: var(--font);
+      scroll-behavior: smooth;
+      scroll-padding-top: 92px;
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 84px; background: #0f172a; }
-    body { margin: 0; color: white; background: #0f172a; line-height: 1.6; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { min-height: 500vh; margin: 0; min-width: 320px; color: var(--white); background: var(--bg); }
+    body, button, input, select, textarea { font-family: var(--font); }
+    body.menu-open { overflow: hidden; }
     a { color: inherit; text-decoration: none; }
     button, input, select, textarea { font: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
     img { display: block; max-width: 100%; }
-    .container { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
-    .section { padding: 88px 0; }
-    .section-heading { max-width: 620px; margin: 0 auto 42px; text-align: center; }
-    .eyebrow { margin: 0 0 10px; color: var(--gold-dark); font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    h1, h2, h3, p { margin-top: 0; }
-    h2 { margin-bottom: 12px; font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.2; letter-spacing: -.045em; }
-    .section-heading > p:last-child { margin-bottom: 0; color: #cbd5e1; }
-    .button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; padding: 12px 21px; border: 1px solid transparent; border-radius: 9px; font-weight: 700; cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease; }
-    .button-gold { color: #111827; background: var(--gold); }
-    .button-gold:hover { background: #fbbf24; box-shadow: 0 6px 16px rgba(245, 158, 11, .2); }
-    .button-outline { color: var(--navy); border-color: #cbd5e1; background: white; }
-    .button-outline:hover { border-color: var(--navy); background: var(--soft); }
-    .button-dark { color: white; background: var(--navy); }
-    .button-dark:hover { background: #1e293b; }
-    .icon { width: 25px; height: 25px; flex: 0 0 auto; color: var(--gold-dark); }
+    #webgl { position: fixed; z-index: 0; top: 0; left: 0; width: 100%; height: 100vh; pointer-events: none; }
+    .cinematic-overlay { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; overflow: hidden; pointer-events: none; }
+    .overlay-copy { width: min(1100px, calc(100% - 48px)); color: rgba(251,191,36,.18); text-align: center; text-transform: uppercase; }
+    .overlay-copy span { display: block; font-size: clamp(34px, 8vw, 108px); font-weight: 800; line-height: .96; letter-spacing: -.07em; }
+    .overlay-copy small { display: block; margin-top: 18px; color: rgba(248,250,252,.2); font-size: 10px; font-weight: 700; letter-spacing: .35em; }
+    .page-content { position: relative; z-index: 20; }
+    main, .footer { position: relative; z-index: 1; }
+    .container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .gold-text { color: var(--gold); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
+    .eyebrow::before { width: 28px; height: 1px; background: var(--gold); content: ""; }
+    .section { position: relative; padding: 112px 0; overflow: hidden; }
+    .section.alt { background: linear-gradient(180deg, rgba(30,41,59,.45), rgba(10,15,30,.3)); }
+    .section-heading { max-width: 700px; margin: 0 auto 48px; text-align: center; }
+    .section-heading .eyebrow { justify-content: center; }
+    h2 { margin: 14px 0; font-size: clamp(32px, 5vw, 52px); line-height: 1.08; letter-spacing: -.045em; }
+    .section-heading p { max-width: 600px; margin: 0 auto; color: var(--muted); line-height: 1.8; font-size: 14px; }
 
-    .site-header { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--line); color: var(--navy); background: rgba(255,255,255,.97); }
-    .nav-wrap { display: flex; min-height: 76px; align-items: center; justify-content: space-between; gap: 24px; }
-    .brand { display: inline-flex; align-items: center; gap: 10px; color: #000; font-size: .95rem; font-weight: 800; letter-spacing: 1px; white-space: nowrap; }
-    .brand-logo { display: block; width: 48px; height: 48px; flex: 0 0 48px; border-radius: 8px; object-fit: cover; }
-    .brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 10px; color: var(--navy); background: var(--gold); }
-    .brand-mark svg { width: 22px; height: 22px; }
-    .main-nav { display: flex; align-items: center; gap: 30px; }
-    .main-nav a { color: #475569; font-size: .9rem; font-weight: 600; }
-    .main-nav a:hover { color: var(--gold-dark); }
-    .main-nav .panel-link { color: var(--gold-dark); font-size: .95rem; font-weight: 800; }
-    .nav-contact { display: flex; align-items: center; gap: 14px; }
-    .nav-phone { font-size: .9rem; font-weight: 700; white-space: nowrap; }
-    .nav-contact .button { min-height: 42px; padding: 9px 15px; }
-    .menu-toggle { display: none; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 9px; background: white; color: var(--navy); cursor: pointer; }
-    .menu-toggle svg { width: 21px; height: 21px; }
+    .navbar {
+      position: fixed; z-index: 20; inset: 0 0 auto; height: 82px;
+      border-bottom: 1px solid transparent; transition: background .3s, border-color .3s, height .3s;
+    }
+    .navbar.scrolled { height: 72px; background: rgba(5,9,18,.78); border-color: var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .nav-inner { width: min(1320px, calc(100% - 48px)); height: 100%; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; flex: 0 0 auto; }
+    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(251,191,36,.55); border-radius: 13px; color: #15110a; background: linear-gradient(135deg,var(--gold),var(--amber)); font-size: 24px; font-weight: 800; box-shadow: 0 7px 26px rgba(245,158,11,.2); }
+    .brand-name { display: block; font-size: 12px; font-weight: 800; letter-spacing: .1em; white-space: nowrap; }
+    .brand-sub { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; letter-spacing: .28em; }
+    .nav-links { display: flex; align-items: center; gap: clamp(18px, 3vw, 38px); margin: 0; padding: 0; list-style: none; }
+    .nav-links a { color: #d4dbea; font-size: 12px; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .call-button, .button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 18px; border: 0; border-radius: 8px; font-size: 11px; font-weight: 800; letter-spacing: .02em; transition: transform .25s, box-shadow .25s, background .25s; cursor: pointer; }
+    .call-button, .button.gold { color: #15110a; background: linear-gradient(135deg,var(--gold),var(--amber)); box-shadow: 0 10px 30px rgba(245,158,11,.17); }
+    .call-button:hover, .button.gold:hover { transform: translateY(-3px); box-shadow: 0 15px 32px rgba(245,158,11,.3); }
+    .menu-toggle { display: none; width: 44px; height: 44px; padding: 11px; border: 1px solid var(--line); border-radius: 9px; background: rgba(30,41,59,.75); cursor: pointer; }
+    .menu-toggle span { display: block; width: 100%; height: 2px; margin: 5px 0; border-radius: 2px; background: var(--white); transition: transform .25s, opacity .25s; }
 
-    .hero { padding: 68px 0 76px; }
-    .hero-grid { display: grid; grid-template-columns: 1fr 1.02fr; align-items: center; gap: 58px; }
-    .hero-copy .eyebrow { margin-bottom: 18px; }
-    .hero h1 { max-width: 590px; margin-bottom: 20px; font-size: clamp(2.7rem, 5.6vw, 4.45rem); line-height: 1.04; letter-spacing: -.065em; }
-    .hero-copy > p:not(.eyebrow) { max-width: 490px; margin-bottom: 28px; color: #cbd5e1; font-size: 1.08rem; }
+    .hero { position: relative; min-height: 100svh; height: max(720px,100svh); display: flex; align-items: center; overflow: hidden; isolation: isolate; }
+    .hero-image, .hero-shade { position: absolute; z-index: -2; inset: -5%; }
+    .hero-image { background: url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2400&q=90") center 58% / cover no-repeat; opacity: .3; transform: scale(1.08); will-change: transform; }
+    .hero-shade { z-index: -1; inset: 0; background: radial-gradient(ellipse at 77% 40%,rgba(245,158,11,.12),transparent 34%), linear-gradient(90deg,rgba(5,8,16,.66) 0%,rgba(5,8,16,.42) 44%,rgba(5,8,16,.15) 100%),linear-gradient(0deg,rgba(10,15,30,.78) 0%,transparent 30%,rgba(5,8,16,.08) 100%); }
+    .hero-content { width: min(1180px,calc(100% - 48px)); margin: 50px auto 0; will-change: transform,opacity; }
+    .hero-kicker { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 23px; color: #e9edf4; font-size: 10px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; }
+    .hero-kicker::before { width: 36px; height: 1px; background: var(--gold); content: ""; }
+    .hero h1 { max-width: 850px; margin: 0; font-size: clamp(56px,9.2vw,118px); line-height: .98; letter-spacing: -.075em; font-weight: 800; }
+    .hero h1 span { display: block; color: var(--gold); }
+    .hero-copy { max-width: 545px; margin: 25px 0 30px; color: #d1d8e4; font-size: clamp(14px,1.5vw,17px); line-height: 1.85; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-    .hero-image-wrap { position: relative; overflow: hidden; min-height: 410px; border-radius: 18px; background: #e2e8f0; }
-    .hero-image-wrap img { width: 100%; height: 100%; min-height: 410px; object-fit: cover; }
-    .hero-image-label { position: absolute; right: 20px; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 12px; max-width: 280px; padding: 14px 17px; border-radius: 10px; background: rgba(255,255,255,.96); box-shadow: 0 8px 26px rgba(15,23,42,.12); }
-    .label-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px #dcfce7; }
-    .hero-image-label strong { display: block; font-size: .88rem; }
-    .hero-image-label span:last-child { color: var(--muted); font-size: .76rem; }
+    .button.outline { border: 1px solid rgba(255,255,255,.6); color: var(--white); background: rgba(255,255,255,.04); }
+    .button.outline:hover { transform: translateY(-3px); border-color: var(--gold); color: var(--gold); }
+    .hero-proof { display: flex; flex-wrap: wrap; gap: 25px; margin-top: 54px; }
+    .proof-item { display: flex; align-items: center; gap: 10px; color: #e4e9f1; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .proof-icon { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid rgba(251,191,36,.4); border-radius: 10px; color: var(--gold); background: rgba(10,15,30,.6); }
+    .hero-scroll { position: absolute; right: max(24px,calc((100vw - 1180px)/2)); bottom: 35px; display: flex; align-items: center; gap: 10px; color: #d1d8e4; font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; writing-mode: vertical-rl; }
+    .hero-scroll i { display: block; width: 1px; height: 44px; background: linear-gradient(var(--gold),transparent); }
 
-    .services { background: transparent; }
-    .service-grid, .benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .service-card, .benefit-card { padding: 28px; border: 1px solid #edf0f4; border-radius: var(--radius); color: var(--navy); background: white; box-shadow: 0 4px 16px rgba(15,23,42,.035); transition: box-shadow .2s ease, transform .2s ease; }
-    .service-card:hover, .benefit-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15,23,42,.09); }
-    .icon-box { display: grid; width: 52px; height: 52px; margin-bottom: 22px; place-items: center; border-radius: 12px; background: #fffbeb; }
-    .service-card h3, .benefit-card h3 { margin-bottom: 9px; font-size: 1.12rem; letter-spacing: -.025em; }
-    .service-card p, .benefit-card p { margin-bottom: 0; color: var(--muted); font-size: .93rem; }
-    .service-link { display: inline-flex; margin-top: 19px; color: var(--gold-dark); font-size: .88rem; font-weight: 700; }
-    .service-link:hover { color: var(--navy); }
+    .services-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; perspective: 1200px; }
+    .service-card { min-height: 305px; padding: 32px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; background: linear-gradient(145deg,rgba(30,41,59,.9),rgba(17,25,41,.82)); box-shadow: 0 20px 60px rgba(0,0,0,.18); transform-style: preserve-3d; transition: border-color .3s, box-shadow .3s; }
+    .service-card:hover { border-color: rgba(251,191,36,.5); box-shadow: 0 25px 65px rgba(0,0,0,.38),0 0 35px rgba(251,191,36,.07); }
+    .service-icon { display: grid; width: 63px; height: 63px; place-items: center; border-radius: 17px; color: #17120a; background: linear-gradient(135deg,var(--gold),var(--amber)); font-size: 27px; box-shadow: 0 12px 25px rgba(245,158,11,.2); }
+    .service-card h3 { margin: 28px 0 11px; font-size: 19px; letter-spacing: -.03em; }
+    .service-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.85; }
+    .service-link { display: inline-flex; margin-top: 23px; color: var(--gold); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 
-    .fleet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .vehicle-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); color: var(--navy); background: white; box-shadow: 0 4px 16px rgba(15,23,42,.045); }
-    .vehicle-image { width: 100%; height: 210px; object-fit: cover; background: #e2e8f0; }
-    .vehicle-content { padding: 20px; }
-    .vehicle-meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: .83rem; }
-    .vehicle-content h3 { margin: 7px 0 15px; font-size: 1.15rem; }
-    .vehicle-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid var(--line); }
-    .vehicle-price { font-size: 1.05rem; font-weight: 800; white-space: nowrap; }
-    .vehicle-price small { color: var(--muted); font-size: .74rem; font-weight: 500; }
-    .vehicle-bottom .button { min-height: 40px; padding: 8px 14px; font-size: .86rem; }
-    .fleet-status { grid-column: 1 / -1; padding: 24px; border: 1px dashed #cbd5e1; border-radius: var(--radius); color: var(--muted); text-align: center; }
+    .fleet-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; perspective: 1400px; }
+    .vehicle-card { overflow: hidden; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: var(--panel-glass); box-shadow: 0 22px 55px rgba(0,0,0,.25); transform-style: preserve-3d; will-change: transform; }
+    .vehicle-image { position: relative; height: 220px; overflow: hidden; background: #121b2c; }
+    .vehicle-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1); }
+    .vehicle-card:hover .vehicle-image img { transform: scale(1.07); }
+    .vehicle-badge { position: absolute; top: 14px; left: 14px; padding: 7px 10px; border: 1px solid rgba(251,191,36,.35); border-radius: 5px; color: var(--gold); background: rgba(10,15,30,.78); font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+    .vehicle-info { padding: 20px; }
+    .vehicle-title { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+    .vehicle-title h3 { margin: 0; font-size: 17px; }
+    .vehicle-year { color: var(--muted); font-size: 11px; }
+    .vehicle-meta { display: flex; flex-wrap: wrap; gap: 13px; margin: 15px 0 18px; color: var(--muted); font-size: 10px; }
+    .vehicle-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 15px; border-top: 1px solid var(--line); }
+    .vehicle-price strong { color: var(--gold); font-size: 22px; letter-spacing: -.04em; }
+    .vehicle-price small { color: var(--muted); font-size: 10px; }
+    .vehicle-bottom .button { min-height: 39px; padding: 0 15px; }
+    .empty-state, .loading-state { grid-column: 1/-1; padding: 28px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); text-align: center; background: rgba(30,41,59,.45); }
 
-    .pickup-banner { padding: 36px 0; color: var(--navy); background: var(--gold); }
-    .pickup-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-    .pickup-inner h2 { max-width: 700px; margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
-    .pickup-phone { font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 800; white-space: nowrap; }
-    .benefit-card { padding: 25px; }
-    .benefit-card .icon-box { width: 46px; height: 46px; margin-bottom: 18px; }
+    .pickup-card { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px; padding: clamp(28px,5vw,55px); overflow: hidden; border: 1px solid rgba(251,191,36,.55); border-radius: 16px; background: radial-gradient(ellipse at 0 100%,rgba(245,158,11,.13),transparent 45%),linear-gradient(135deg,rgba(30,41,59,.92),rgba(13,20,35,.96)); box-shadow: 0 25px 70px rgba(0,0,0,.25),inset 0 0 45px rgba(251,191,36,.035); }
+    .pickup-icon { display: grid; width: 86px; height: 86px; place-items: center; border-radius: 24px; color: #17120a; background: linear-gradient(135deg,var(--gold),var(--amber)); font-size: 38px; }
+    .pickup-card h2 { margin: 0 0 11px; font-size: clamp(23px,3.2vw,36px); }
+    .pickup-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .pickup-card .button { white-space: nowrap; }
 
-    .service-discount { display: inline-block; margin: -2px 0 14px; padding: 4px 9px; border-radius: 6px; color: #713f12; background: #fbbf24; font-size: .75rem; font-weight: 700; }
+    .benefit-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+    .benefit { padding: 30px; border-left: 1px solid rgba(251,191,36,.35); }
+    .benefit-icon { color: var(--gold); font-size: 34px; }
+    .benefit h3 { margin: 15px 0 9px; font-size: 16px; }
+    .benefit p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 
-    .booking-section { background: transparent; }
-    .booking-card { max-width: 850px; margin: 0 auto; padding: 34px; border: 1px solid #edf0f4; border-radius: 16px; color: var(--navy); background: white; box-shadow: 0 12px 36px rgba(15,23,42,.075); }
-    .booking-heading { margin-bottom: 26px; }
-    .booking-heading h2 { margin-bottom: 7px; }
-    .booking-heading p { margin: 0; color: var(--muted); }
-    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-    .form-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; }
-    .form-field.full { grid-column: 1 / -1; }
-    .form-field label { font-size: .87rem; font-weight: 700; }
-    .form-field input, .form-field select, .form-field textarea { width: 100%; min-height: 46px; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; color: var(--navy); background: white; }
-    .form-field textarea { min-height: 100px; resize: vertical; }
-    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--gold-dark); box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
-    .booking-submit { margin-top: 20px; }
-    .booking-info { margin: 16px 0 0; color: var(--muted); font-size: .82rem; }
-    .form-message { margin: 16px 0 0; padding: 12px 14px; border-radius: 8px; font-size: .9rem; }
-    .form-message[hidden] { display: none; }
-    .form-message.success { color: #166534; background: #dcfce7; }
-    .form-message.error { color: #991b1b; background: #fee2e2; }
+    .discount-wrap { overflow: hidden; padding: 5px 0; background: linear-gradient(110deg,#fbbf24,#f59e0b 55%,#fbbf24); color: #14110a; }
+    .discount-content { width: min(1180px,calc(100% - 48px)); min-height: 205px; display: flex; align-items: center; justify-content: space-between; gap: 35px; margin: auto; }
+    .discount-content h2 { margin: 0; font-size: clamp(48px,8vw,92px); letter-spacing: -.08em; }
+    .discount-content p { max-width: 400px; margin: 0; font-size: 14px; line-height: 1.7; font-weight: 600; }
+    .discount-tag { font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; }
 
-    .contact { padding: 76px 0; color: white; background: var(--navy); }
-    .contact-grid { display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 42px; }
-    .contact .eyebrow { color: #fbbf24; }
-    .contact h2 { margin-bottom: 14px; }
-    .contact-copy > p:not(.eyebrow) { color: #cbd5e1; }
-    .contact-phone { display: inline-block; margin: 6px 0 20px; color: white; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -.04em; }
-    .contact-address { margin: 18px 0 23px; color: #cbd5e1; }
-    .contact-address strong { display: block; margin-bottom: 4px; color: white; }
-    .whatsapp-cta { color: white; border-color: rgba(255,255,255,.25); background: transparent; }
-    .whatsapp-cta:hover { border-color: #22c55e; background: rgba(34,197,94,.12); }
-    .map-frame { overflow: hidden; width: 100%; min-height: 320px; border: 0; border-radius: var(--radius); background: #1e293b; }
-    .map-block { min-width: 0; }
-    .map-note { margin: 12px 0 0; color: #cbd5e1; font-size: .9rem; }
+    .booking-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 55px; align-items: start; }
+    .booking-aside h2 { margin: 16px 0; font-size: clamp(34px,5vw,55px); }
+    .booking-aside p { color: var(--muted); font-size: 13px; line-height: 1.9; }
+    .booking-contact { display: grid; gap: 13px; margin-top: 30px; }
+    .booking-contact a { color: #e8edf5; font-size: 12px; }
+    .booking-contact a:hover { color: var(--gold); }
+    .booking-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; padding: clamp(22px,4vw,36px); border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(145deg,rgba(30,41,59,.85),rgba(18,26,42,.9)); box-shadow: 0 25px 70px rgba(0,0,0,.25); }
+    .field { display: grid; gap: 8px; }
+    .field.full { grid-column: 1/-1; }
+    .field label { color: #dce3ed; font-size: 10px; font-weight: 700; }
+    .field input, .field select, .field textarea { width: 100%; min-height: 47px; padding: 12px 13px; outline: 0; border: 1px solid rgba(255,255,255,.12); border-radius: 7px; color: var(--white); background: rgba(10,15,30,.7); font-size: 12px; transition: border-color .2s, box-shadow .2s; }
+    .field textarea { min-height: 95px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(251,191,36,.1); }
+    .field select option { color: var(--white); background: var(--panel); }
+    .form-bottom { grid-column: 1/-1; display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .form-message { min-height: 20px; color: #b8c4d7; font-size: 11px; line-height: 1.6; }
+    .form-message.success { color: #86efac; }
+    .form-message.error { color: #fda4af; }
 
-    .site-footer { padding: 42px 0 20px; color: #cbd5e1; background: #050b16; }
-    .footer-grid { display: grid; grid-template-columns: 1.4fr .7fr .9fr; gap: 40px; padding-bottom: 34px; }
-    .footer-brand { margin-bottom: 14px; color: white; }
-    .footer-about p { max-width: 350px; margin: 0; font-size: .9rem; }
-    .footer-column h3 { margin-bottom: 13px; color: white; font-size: .92rem; }
-    .footer-links { display: grid; gap: 8px; font-size: .88rem; }
-    .footer-links a:hover { color: #fbbf24; }
-    .footer-bottom { padding-top: 18px; border-top: 1px solid #1e293b; font-size: .82rem; text-align: center; }
-    .floating-whatsapp { position: fixed; z-index: 20; right: 22px; bottom: 22px; display: grid; width: 58px; height: 58px; place-items: center; border-radius: 50%; color: white; background: #22c55e; box-shadow: 0 6px 20px rgba(15,23,42,.25); transition: background-color .18s ease, transform .18s ease; }
-    .floating-whatsapp:hover { transform: translateY(-2px); background: #16a34a; }
-    .floating-whatsapp svg { width: 29px; height: 29px; }
+    .contact-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 25px; }
+    .contact-card, .map-frame { min-height: 340px; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+    .contact-card { padding: 32px; }
+    .contact-card h3 { margin: 0 0 22px; font-size: 21px; }
+    .contact-row { display: flex; gap: 13px; margin: 18px 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .contact-row b { color: var(--gold); font-size: 16px; }
+    .contact-row a { color: var(--white); }
+    .map-frame iframe { width: 100%; height: 100%; min-height: 340px; border: 0; filter: grayscale(.45) contrast(1.05); }
 
-    @media (max-width: 900px) {
-      .main-nav { gap: 18px; }
-      .nav-wrap { gap: 14px; }
-      .hero-grid { gap: 34px; }
-      .hero-image-wrap, .hero-image-wrap img { min-height: 350px; }
-      .fleet-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer { padding: 60px 0 24px; border-top: 1px solid var(--line); background: #080d18; }
+    .footer-grid { display: grid; grid-template-columns: 1.3fr .8fr .8fr; gap: 55px; padding-bottom: 42px; }
+    .footer-about p { max-width: 370px; color: var(--muted); font-size: 12px; line-height: 1.9; }
+    .footer h3 { margin: 0 0 18px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+    .footer-links { display: grid; gap: 12px; color: var(--muted); font-size: 11px; }
+    .footer-links a:hover { color: var(--gold); }
+    .socials { display: flex; gap: 9px; margin-top: 20px; }
+    .socials a { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 10px; color: var(--gold); font-size: 11px; font-weight: 800; }
+    .socials a:hover { background: rgba(251,191,36,.1); }
+    .footer-bottom { padding-top: 20px; border-top: 1px solid var(--line); color: #8190a6; font-size: 10px; text-align: center; }
+    .whatsapp-float { position: fixed; z-index: 19; right: 22px; bottom: 22px; display: grid; width: 58px; height: 58px; place-items: center; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; color: white; background: #19bd68; box-shadow: 0 12px 35px rgba(0,0,0,.38); font-size: 25px; transition: transform .2s; }
+    .whatsapp-float:hover { transform: translateY(-4px) scale(1.04); }
+
+    .reveal { opacity: 1; will-change: transform, opacity; }
+    .js-motion .reveal { opacity: 0; }
+    @media (max-width: 960px) {
+      .nav-inner { gap: 16px; }
+      .nav-links { gap: 17px; }
+      .nav-links a { font-size: 11px; }
+      .call-button { padding: 0 13px; font-size: 10px; }
+      .fleet-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .booking-layout { gap: 30px; }
     }
-    @media (max-width: 700px) {
-      .container { width: min(100% - 32px, 540px); }
-      .section { padding: 65px 0; }
-      .nav-wrap { min-height: 68px; }
-      .brand { font-size: .83rem; }
-      .menu-toggle { display: grid; place-items: center; margin-left: auto; }
-      .nav-contact { gap: 0; }
-      .nav-phone { display: none; }
-      .nav-contact .button { min-height: 40px; padding: 8px 12px; font-size: .83rem; }
-      .main-nav { position: absolute; top: calc(100% + 1px); right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: 8px 16px 14px; border-bottom: 1px solid var(--line); background: white; box-shadow: 0 12px 18px rgba(15,23,42,.06); }
-      .main-nav.open { display: flex; }
-      .main-nav a { padding: 11px 8px; }
-      .hero { padding: 48px 0 58px; }
-      .hero-grid { grid-template-columns: 1fr; gap: 30px; }
-      .hero h1 { max-width: 520px; font-size: clamp(2.55rem, 12vw, 3.6rem); }
-      .hero-copy > p:not(.eyebrow) { font-size: 1rem; }
-      .hero-image-wrap, .hero-image-wrap img { min-height: 280px; }
-      .service-grid, .benefit-grid { grid-template-columns: 1fr; gap: 14px; }
-      .service-card, .benefit-card { padding: 23px; }
+    @media (max-width: 740px) {
+      :root { scroll-padding-top: 75px; }
+      .container, .hero-content, .discount-content { width: min(100% - 36px,600px); }
+      .navbar { height: 72px; background: rgba(5,9,18,.72); backdrop-filter: blur(16px); }
+      .nav-inner { width: calc(100% - 32px); }
+      .brand-mark { width: 38px; height: 38px; }
+      .brand-name { font-size: 10px; }
+      .brand-sub { font-size: 8px; }
+      .call-button { display: none; }
+      .menu-toggle { display: block; }
+      .nav-links { position: fixed; inset: 72px 0 auto; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 12px 22px 24px; border-bottom: 1px solid var(--line); background: rgba(5,9,18,.97); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: .25s; }
+      .nav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+      .nav-links li { border-bottom: 1px solid rgba(255,255,255,.07); }
+      .nav-links a { display: block; padding: 15px 4px; font-size: 13px; }
+      .menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(7px) rotate(45deg); }
+      .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+      .menu-toggle[aria-expanded="true"] span:last-child { transform: translateY(-7px) rotate(-45deg); }
+      .hero { height: max(760px,100svh); min-height: 690px; }
+      .hero-image { background-position: 62% center; }
+      .hero-image { opacity: .24; }
+      .hero-shade { background: linear-gradient(90deg,rgba(5,8,16,.56),rgba(5,8,16,.3)),linear-gradient(0deg,rgba(10,15,30,.78) 0%,transparent 35%); }
+      .hero h1 { font-size: clamp(53px,14vw,86px); }
+      .hero-copy { max-width: 460px; font-size: 13px; }
+      .hero-proof { gap: 12px 20px; margin-top: 40px; }
+      .proof-item { font-size: 9px; }
+      .section { padding: 82px 0; }
+      .services-grid, .benefit-grid { grid-template-columns: 1fr; }
+      .service-card { min-height: 250px; }
+      .pickup-card { grid-template-columns: auto 1fr; gap: 18px; }
+      .pickup-icon { width: 65px; height: 65px; border-radius: 18px; font-size: 30px; }
+      .pickup-card .button { grid-column: 1/-1; justify-self: start; }
+      .discount-content { min-height: 190px; align-items: flex-start; justify-content: center; flex-direction: column; gap: 8px; }
+      .discount-content p { font-size: 12px; }
+      .booking-layout, .contact-grid { grid-template-columns: 1fr; }
+      .booking-aside { max-width: 560px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px 24px; }
+      .footer-about { grid-column: 1/-1; }
+    }
+    @media (max-width: 520px) {
       .fleet-grid { grid-template-columns: 1fr; }
-      .vehicle-image { height: 220px; }
-      .pickup-inner { align-items: flex-start; flex-direction: column; gap: 12px; }
-      .booking-card { padding: 24px 19px; }
-      .form-grid { grid-template-columns: 1fr; gap: 15px; }
-      .form-field.full { grid-column: auto; }
-      .contact-grid { grid-template-columns: 1fr; gap: 28px; }
-      .map-frame { min-height: 280px; }
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
-      .footer-about { grid-column: 1 / -1; }
-      .floating-whatsapp { right: 16px; bottom: 16px; width: 54px; height: 54px; }
-    }
-    @media (max-width: 390px) {
-      .nav-wrap { gap: 8px; }
-      .brand { font-size: .75rem; gap: 7px; }
-      .nav-contact .button { padding-inline: 9px; font-size: .78rem; }
+      .vehicle-image { height: 230px; }
+      .booking-form { grid-template-columns: 1fr; padding: 21px; }
+      .field.full, .form-bottom { grid-column: auto; }
+      .form-bottom { align-items: stretch; flex-direction: column; }
+      .form-bottom .button { width: 100%; }
+      .pickup-card { grid-template-columns: 1fr; }
+      .pickup-card .button { grid-column: auto; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-about { grid-column: auto; }
+      .hero-actions { align-items: stretch; flex-direction: column; max-width: 270px; }
       .hero-actions .button { width: 100%; }
+      .hero-scroll { right: 13px; bottom: 25px; }
+      .whatsapp-float { right: 15px; bottom: 15px; width: 52px; height: 52px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
-
-    .testimonial-header { text-align: center; margin-bottom: 32px; }
-    .google-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border: 1px solid #1e293b; border-radius: 26px; background: #0f172a; color: white; font-size: .85rem; font-weight: 700; }
-    .google-g { width: 20px; height: 20px; }
-    .google-rating { display: flex; align-items: center; gap: 6px; font-weight: 700; }
-    .google-stars { color: #f8c000; font-size: 1.1rem; letter-spacing: 1px; }
-    .google-label { color: #cbd5e1; }
-    .review-card { padding: 32px 28px; border: 1px solid #1e293b; border-radius: var(--radius); background: #0f172a; position: relative; }
-    .stars { color: var(--gold); font-size: 1.2rem; margin-bottom: 16px; letter-spacing: 2px; }
-    .review-card p { color: #cbd5e1; font-size: .95rem; line-height: 1.6; margin-bottom: 24px; font-style: italic; }
-    .customer-info { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .customer-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1e293b; object-fit: cover; border: 2px solid var(--gold-dark); }
-    .customer-name { font-weight: 700; color: white; font-size: .95rem; }
-    .customer-city { color: var(--muted); font-size: .85rem; }
-    .review-google { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
-    .review-google svg { width: 14px; height: 14px; }
-    .quote-mark { position: absolute; top: 20px; right: 24px; color: #1e293b; font-size: 3rem; font-family: Georgia, serif; opacity: .3; }
-
-    @media (max-width: 900px) { .testimonial-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-    @media (max-width: 700px) { .testimonial-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="#anasayfa" aria-label="Uzel Prestij Garaj ana sayfa">
-        <img class="brand-logo" src="logo.icon.png" alt="">
-        <span>UZEL PRESTİJ GARAJ</span>
-      </a>
-      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="mainNav">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <nav class="main-nav" id="mainNav" aria-label="Ana menü">
-        <a href="#anasayfa">Ana Sayfa</a>
-        <a href="#hizmetler">Hizmetler</a>
-        <a href="#araclar">Araçlar</a>
-        <a href="#iletisim">İletişim</a>
-        <a class="panel-link" href="giris.html">PANEL</a>
-      </nav>
-      <div class="nav-contact">
-        <a class="nav-phone" href="tel:+905395253091">0539 525 30 91</a>
-        <a class="button button-gold" href="tel:+905395253091">Hemen Ara</a>
-      </div>
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="cinematic-overlay" id="cinematicOverlay" aria-hidden="true">
+    <div class="overlay-copy" id="overlayCopy">
+      <span id="overlayTitle">Yol Sizin.<br>İmza Bizim.</span>
+      <small id="overlayCaption">UZEL PRESTİJ GARAJ · SAMANDAĞ</small>
     </div>
+  </div>
+  <div class="page-content">
+  <header class="navbar" id="navbar">
+    <nav class="nav-inner" aria-label="Ana menü">
+      <a class="brand" href="#anasayfa" aria-label="Uzel Prestij Garaj ana sayfa">
+        <span class="brand-mark" aria-hidden="true">U</span>
+        <span><span class="brand-name">UZEL PRESTİJ GARAJ</span><span class="brand-sub">SAMANDAĞ · HATAY</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#anasayfa">Ana Sayfa</a></li>
+        <li><a href="#hizmetler">Hizmetler</a></li>
+        <li><a href="#filo">Araç Filosu</a></li>
+        <li><a href="#iletisim">İletişim</a></li>
+      </ul>
+      <a class="call-button" href="tel:+905395253091">HEMEN ARA <span aria-hidden="true">→</span> 0539 525 30 91</a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menüyü aç" aria-controls="navLinks" aria-expanded="false"><span></span><span></span><span></span></button>
+    </nav>
   </header>
 
   <main>
     <section class="hero" id="anasayfa">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow">Samandağ'da otomotiv hizmetleri</p>
-          <h1>Yol Sizin.<br>İmza Bizim.</h1>
-          <p>Samandağ Kuşalanı ve çevresinde araç kiralama, yıkama ve tamir hizmetleri.</p>
-          <div class="hero-actions">
-            <a class="button button-gold" href="#rezervasyon">Rezervasyon Yap</a>
-            <a class="button button-outline" href="#araclar">Araçları Gör</a>
-          </div>
+      <div class="hero-image" id="heroImage" aria-hidden="true"></div>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content" id="heroContent">
+        <div class="hero-kicker">Samandağ'ın prestijli garajı</div>
+        <h1>Yol Sizin.<span>İmza Bizim.</span></h1>
+        <p class="hero-copy">Samandağ Kuşalanı ve çevresinde aracınız emin ellerde. Özenle seçilmiş araç filosu, profesyonel servis ve kusursuz bir yol deneyimi.</p>
+        <div class="hero-actions">
+          <a class="button gold" href="#rezervasyon">Hemen Rezervasyon Yap <span aria-hidden="true">↗</span></a>
+          <a class="button outline" href="#filo">Araçları Gör <span aria-hidden="true">↓</span></a>
         </div>
-        <div class="hero-image-wrap">
-          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="Gün ışığında şık ve modern bir otomobil" fetchpriority="high">
-          <div class="hero-image-label"><span class="label-dot" aria-hidden="true"></span><span><strong>Güvenle yola çıkın</strong><span>Konforlu hizmet, keyifli yolculuk</span></span></div>
+        <div class="hero-proof" aria-label="Hizmet avantajları">
+          <div class="proof-item"><span class="proof-icon" aria-hidden="true">✦</span><span>Özenli hizmet</span></div>
+          <div class="proof-item"><span class="proof-icon" aria-hidden="true">◈</span><span>Bakımlı filo</span></div>
+          <div class="proof-item"><span class="proof-icon" aria-hidden="true">⌖</span><span>Ücretsiz teslimat</span></div>
+        </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">Aşağı kaydır <i></i></div>
+    </section>
+
+    <section class="section" id="hizmetler">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Hizmetlerimiz</span>
+          <h2>Her yolculukta <span class="gold-text">yanınızdayız.</span></h2>
+          <p>Aracınız ve yolculuğunuz için ihtiyaç duyduğunuz özenli hizmet, tek bir adreste.</p>
+        </div>
+        <div class="services-grid">
+          <article class="service-card reveal">
+            <div class="service-icon" aria-hidden="true">🚘</div>
+            <h3>OTO KİRALAMA</h3>
+            <p>Konforlu, bakımlı araç filomuzla planlarınıza özgürlük katın. İhtiyacınıza uygun aracı kolayca seçin.</p>
+            <a class="service-link" href="#filo">Filoyu keşfet <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="service-card reveal">
+            <div class="service-icon" aria-hidden="true">✧</div>
+            <h3>OTO YIKAMA</h3>
+            <p>İç-dış detaylı temizlik, pasta-cila ve özenli bakım ile aracınızın ilk günkü ışıltısını koruyun.</p>
+            <a class="service-link" href="#rezervasyon" data-service="Yıkama">Randevu al <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="service-card reveal">
+            <div class="service-icon" aria-hidden="true">⚙</div>
+            <h3>OTO TAMİR</h3>
+            <p>Deneyimli ustalarımızdan güvenilir bakım ve onarım. Kuşalanı ve çevresine ücretsiz araç alım-teslim.</p>
+            <a class="service-link" href="#rezervasyon" data-service="Servis">Servis randevusu <span aria-hidden="true">↗</span></a>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section services" id="hizmetler">
+    <section class="section alt" id="filo">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Size nasıl yardımcı olabiliriz?</p>
-          <h2>Her yolculuğa uygun hizmet</h2>
-          <p>Aracınız ve yolculuğunuz için ihtiyacınız olan hizmet, tek bir adreste.</p>
-        </div>
-        <div class="service-grid">
-          <article class="service-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 14.5 5.1 9a2 2 0 0 1 1.87-1.3h10.06A2 2 0 0 1 18.9 9l2.1 5.5v4h-2v-2H5v2H3v-4ZM5 14h14M7 11h.01M17 11h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3>Oto Kiralama</h3><p>İhtiyacınıza uygun, bakımlı araçlarla yolculuğunuzun keyfini çıkarın.</p>
-            <a class="service-link" href="#araclar">Filoyu inceleyin <span aria-hidden="true">→</span></a>
-          </article>
-          <article class="service-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3s6 6.1 6 11a6 6 0 1 1-12 0c0-4.9 6-11 6-11Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 15a3 3 0 0 0 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-            <h3>Oto Yıkama</h3><span class="service-discount">%10 İndirim</span><p>Aracınıza özenli iç ve dış temizlikle ferah, tertemiz bir görünüm kazandırın.</p>
-            <a class="service-link" href="#rezervasyon">Yıkama randevusu alın <span aria-hidden="true">→</span></a>
-          </article>
-          <article class="service-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.2 6.1a5 5 0 0 0-6.3 6.3L3.5 16.8a2.12 2.12 0 0 0 3 3l4.4-4.4a5 5 0 0 0 6.3-6.3l-3 3-3.3-3.3 3.3-2.7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-            <h3>Oto Tamir</h3><p>Aracınızın bakım ve onarım ihtiyaçlarında deneyimli ekibimiz yanınızda.</p>
-            <a class="service-link" href="#rezervasyon">Servis talebi oluşturun <span aria-hidden="true">→</span></a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="araclar">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Yolculuğunuza hazır</p>
-          <h2>Kiralık Araç Filomuz</h2>
-          <p>Size en uygun aracı seçin, rezervasyon talebinizi kolayca iletin.</p>
+        <div class="section-heading reveal">
+          <span class="eyebrow">Seçkin araçlar</span>
+          <h2>KİRALIK ARAÇ <span class="gold-text">FİLOMUZ</span></h2>
+          <p>İhtiyacınıza uygun aracınızı seçin, rezervasyon talebinizi hemen gönderin.</p>
         </div>
         <div class="fleet-grid" id="fleetGrid" aria-live="polite">
-          <p class="fleet-status">Araçlarımız yükleniyor…</p>
+          <div class="loading-state">Müsait araçlarımız yükleniyor...</div>
         </div>
-      </div>
-    </section>
-
-    <section class="pickup-banner">
-      <div class="container pickup-inner">
-        <h2>Kuşalanı ve Çevresine Ücretsiz Araç Alım-Teslim Hizmeti</h2>
-        <a class="pickup-phone" href="tel:+905395253091">0539 525 30 91</a>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Uzel Prestij Garaj farkı</p>
-          <h2>Neden Biz?</h2>
-          <p>Her hizmette güveninizi ve memnuniyetinizi ön planda tutuyoruz.</p>
+        <article class="pickup-card reveal" id="pickupCard">
+          <div class="pickup-icon" aria-hidden="true">🚚</div>
+          <div>
+            <span class="eyebrow">Konfor kapınızda</span>
+            <h2>Kuşalanı ve Çevresine <span class="gold-text">Ücretsiz Araç Alım-Teslim</span></h2>
+            <p>Aracınızı bulunduğunuz yerden alıyor, hizmet sonrası güvenle teslim ediyoruz. Bölge ve detaylar için bizi arayın.</p>
+          </div>
+          <a class="button gold" href="tel:+905395253091">Detayları Sor <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section alt" id="neden">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Neden Uzel Prestij Garaj</span>
+          <h2>Güvenle yola <span class="gold-text">çıkmanız için.</span></h2>
         </div>
         <div class="benefit-grid">
-          <article class="benefit-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 7 3v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3>Güvenilir Hizmet</h3><p>İletişimden teslimata kadar şeffaf, güven veren bir deneyim sunuyoruz.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-            <h3>Kaliteli İşçilik</h3><p>Aracınıza özen gösteriyor, hizmetlerimizi titizlikle tamamlıyoruz.</p>
-          </article>
-          <article class="benefit-card">
-            <div class="icon-box"><svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M17 7.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 1.7 2.6 5 3 5 1.3 5 3-2.2 3-5 3-5-1.3-5-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-            <h3>Uygun Fiyat</h3><p>İhtiyacınıza uygun seçenekler ve avantajlı fiyatlarla yanınızdayız.</p>
-          </article>
+          <article class="benefit reveal"><div class="benefit-icon" aria-hidden="true">◈</div><h3>Güvenilir Hizmet</h3><p>İlk iletişimden araç teslimine kadar şeffaf ve özenli bir hizmet anlayışı.</p></article>
+          <article class="benefit reveal"><div class="benefit-icon" aria-hidden="true">✦</div><h3>Kaliteli İşçilik</h3><p>Aracınızın bakım ve onarımında deneyimli ekip, titiz uygulama ve kalite.</p></article>
+          <article class="benefit reveal"><div class="benefit-icon" aria-hidden="true">₺</div><h3>Uygun Fiyat</h3><p>İhtiyacınıza göre net fiyatlandırma, sürprizsiz ve ulaşılabilir çözümler.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="section booking-section" id="rezervasyon">
-      <div class="container">
-        <div class="booking-card">
-          <div class="booking-heading">
-            <p class="eyebrow">Bir adımda talep oluşturun</p>
-            <h2>Rezervasyon Formu</h2>
-            <p>Bilgilerinizi bırakın, en kısa sürede sizinle iletişime geçelim.</p>
-          </div>
-          <form id="bookingForm">
-            <div class="form-grid">
-              <div class="form-field">
-                <label for="customerName">Ad Soyad</label>
-                <input id="customerName" name="ad" type="text" autocomplete="name" required>
-              </div>
-              <div class="form-field">
-                <label for="customerPhone">Telefon</label>
-                <input id="customerPhone" name="telefon" type="tel" autocomplete="tel" inputmode="tel" required>
-              </div>
-              <div class="form-field">
-                <label for="vehicleSelect">Araç Seçimi</label>
-                <select id="vehicleSelect" name="aracId">
-                  <option value="">Araç seçiniz (isteğe bağlı)</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="bookingDate">Tarih</label>
-                <input id="bookingDate" name="tarih" type="date" required>
-              </div>
-              <div class="form-field full">
-                <label for="serviceType">Hizmet Türü</label>
-                <select id="serviceType" name="hizmetTuru" required>
-                  <option value="">Hizmet seçiniz</option>
-                  <option value="Kiralama">Kiralama</option>
-                  <option value="Yıkama">Oto Yıkama ( %10 İndirim )</option>
-                  <option value="Servis">Servis</option>
-                </select>
-              </div>
-              <div class="form-field full">
-                <label for="bookingNote">Not</label>
-                <textarea id="bookingNote" name="not" placeholder="Talebinizle ilgili eklemek istedikleriniz"></textarea>
-              </div>
-            </div>
-            <p class="booking-info">Not: Oto yıkama hizmetlerinde %10 indirim uygulanmaktadır.</p>
-            <button class="button button-gold booking-submit" id="bookingSubmit" type="submit">Rezervasyon Yap</button>
-            <p class="form-message" id="formMessage" role="status" aria-live="polite" hidden></p>
-          </form>
-        </div>
+    <section class="discount-wrap" aria-label="Açılışa özel indirim">
+      <div class="discount-content reveal" id="discountContent">
+        <div><span class="discount-tag">Açılışa özel fırsat</span><h2>%10 İNDİRİM</h2></div>
+        <p>Aracınızı bize getirin, seçili hizmetlerde açılışa özel indirim fırsatından yararlanın. Detaylar için hemen arayın.</p>
       </div>
     </section>
 
-    <section class="contact" id="iletisim">
-      <div class="container contact-grid">
-        <div class="contact-copy">
-          <p class="eyebrow">Bize ulaşın</p>
-          <h2>Yola birlikte çıkalım.</h2>
-          <p>Sorularınız ve rezervasyon talepleriniz için bizi arayın ya da WhatsApp'tan yazın.</p>
-          <a class="contact-phone" href="tel:+905395253091">0539 525 30 91</a>
-          <div><a class="button whatsapp-cta" href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer">WhatsApp'tan Yazın</a></div>
-          <p class="contact-address"><strong>Adresimiz</strong>Samandağ Atatürk Mah. 12. Cad. No:123,<br>Samandağ / Hatay</p>
-        </div>
-        <div class="map-block">
-          <iframe class="map-frame" title="Uzel Prestij Garaj konum haritası" src="https://www.google.com/maps?q=Uzel+Prestij+Garaj+Samanda%C4%9F+Atat%C3%BCrk+Mah+12+Cad+No:123+Samanda%C4%9F+Hatay&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <p class="map-note">Kuşalanı ve çevresine ücretsiz araç alım-teslim hizmeti veriyoruz.</p>
-        </div>
-      </div>
-    </section>
-    <section class="testimonials" id="musteriler">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Müşteri Geri Bildirimleri</p>
-          <h2>Müşterilerimiz Ne Diyor?</h2>
-          <p>Hizmetlerimizden memnun olan değerli müşterilerimizin paylaşımları.</p>
-        </div>
-        <div class="testimonial-header">
-          <div class="google-badge">
-            <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
-            <div class="google-rating">
-              <div class="google-stars">★★★★★</div>
-              <span class="google-label">Google'da 5.0 Puan</span>
-            </div>
+    <section class="section" id="rezervasyon">
+      <div class="container booking-layout">
+        <div class="booking-aside reveal">
+          <span class="eyebrow">Rezervasyon</span>
+          <h2>Planınızı <span class="gold-text">bizimle yapın.</span></h2>
+          <p>Formu gönderin, ekibimiz talebinizi inceleyip en kısa sürede sizinle iletişime geçsin. Talep göndermek kesin rezervasyon anlamına gelmez.</p>
+          <div class="booking-contact">
+            <a href="tel:+905395253091">☎ &nbsp; 0539 525 30 91</a>
+            <a href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer">◉ &nbsp; WhatsApp üzerinden yazın</a>
           </div>
         </div>
-        <div class="testimonial-grid">
-          <article class="review-card">
-            <span class="quote-mark">“</span>
-            <div class="stars">★★★★★</div>
-            <p>"Uzel Prestij Garaj'dan kiraladığım araçla kusursuz bir yolculuk yaşadım. Araç çok temiz ve bakımlıydı. Kesinlikle tekrar tercih edeceğim."</p>
-            <div class="customer-info">
-              <div>
-                <img class="customer-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1272a8e396?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Ahmet Yılmaz">
-                <div class="customer-name">Ahmet Yılmaz</div>
-                <div class="customer-city">Samandağ / Hatay</div>
-              </div>
-              <div class="review-google">
-                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
-                <span>Google</span>
-              </div>
-            </div>
-          </article>
-          <article class="review-card">
-            <span class="quote-mark">“</span>
-            <div class="stars">★★★★★</div>
-            <p>"Oto yıkama servisi gerçekten profesyonel. Arabam ilk günkü gibi parlıyor. Samandağ'daki en iyi otomotiv hizmeti burası."</p>
-            <div class="customer-info">
-              <div>
-                <img class="customer-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Elif Demir">
-                <div class="customer-name">Elif Demir</div>
-                <div class="customer-city">Kuşalanı / Hatay</div>
-              </div>
-              <div class="review-google">
-                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
-                <span>Google</span>
-              </div>
-            </div>
-          </article>
-          <article class="review-card">
-            <span class="quote-mark">“</span>
-            <div class="stars">★★★★★</div>
-            <p>"Rezervasyon süreci çok hızlı ve sorunsuz oldu. Personel çok nazik ve yardımcıydı. Uzel Prestij Garaj'ı herkese tavsiye ederim."</p>
-            <div class="customer-info">
-              <div>
-                <img class="customer-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&amp;fit=crop&amp;w=150&amp;q=80" alt="Mehmet Kaya">
-                <div class="customer-name">Mehmet Kaya</div>
-                <div class="customer-city">Samandağ / Hatay</div>
-              </div>
-              <div class="review-google">
-                <svg class="google-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 2v6h6"/><path d="M12 12h6v2h-6z"/></svg>
-                <span>Google</span>
-              </div>
-            </div>
-          </article>
+        <form class="booking-form reveal" id="bookingForm">
+          <div class="field"><label for="customerName">Ad Soyad</label><input id="customerName" name="ad" autocomplete="name" required placeholder="Adınız ve soyadınız"></div>
+          <div class="field"><label for="customerPhone">Telefon</label><input id="customerPhone" name="telefon" type="tel" autocomplete="tel" required placeholder="05xx xxx xx xx"></div>
+          <div class="field"><label for="vehicleSelect">Araç Seçimi</label><select id="vehicleSelect" name="arac" required><option value="">Araç seçiniz</option></select></div>
+          <div class="field"><label for="bookingDate">Tarih</label><input id="bookingDate" name="tarih" type="date" required></div>
+          <div class="field"><label for="serviceSelect">Hizmet Türü</label><select id="serviceSelect" name="hizmetTuru" required><option value="">Hizmet seçiniz</option><option value="Kiralama">Kiralama</option><option value="Yıkama">Yıkama</option><option value="Servis">Servis</option></select></div>
+          <div class="field full"><label for="bookingNotes">Not</label><textarea id="bookingNotes" name="not" placeholder="Talebinizle ilgili eklemek istedikleriniz"></textarea></div>
+          <div class="form-bottom">
+            <button class="button gold" id="bookingSubmit" type="submit">Talep Gönder <span aria-hidden="true">→</span></button>
+            <div class="form-message" id="bookingMessage" role="status" aria-live="polite"></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="section alt" id="iletisim">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Bize ulaşın</span>
+          <h2>Görüşmek üzere, <span class="gold-text">yol arkadaşınız.</span></h2>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-card reveal">
+            <h3>İletişim Bilgileri</h3>
+            <div class="contact-row"><b aria-hidden="true">☎</b><span><a href="tel:+905395253091">0539 525 30 91</a><br>Telefon ve WhatsApp</span></div>
+            <div class="contact-row"><b aria-hidden="true">⌖</b><span>Samandağ Atatürk Mah. 12. Cad. No:123,<br>Samandağ / Hatay</span></div>
+            <a class="button gold" href="https://maps.google.com/?q=Samanda%C4%9F+Atat%C3%BCrk+Mahallesi+12.+Cadde" target="_blank" rel="noopener noreferrer">Yol Tarifi Al <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="map-frame reveal">
+            <iframe title="Uzel Prestij Garaj konumu - Samandağ Hatay" src="https://maps.google.com/maps?q=Samanda%C4%9F%20Atat%C3%BCrk%20Mahallesi%2012.%20Cadde%20Hatay&t=&z=14&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-about">
-          <a class="brand footer-brand" href="#anasayfa"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 14.5 5.1 9a2 2 0 0 1 1.87-1.3h10.06A2 2 0 0 1 18.9 9l2.1 5.5v4h-2v-2H5v2H3v-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 14h14M7 11h.01M17 11h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>UZEL PRESTİJ GARAJ</a>
-          <p>Samandağ Kuşalanı'nda araç kiralama, oto yıkama ve tamir hizmetlerinde güvenilir çözüm ortağınız.</p>
+          <a class="brand" href="#anasayfa"><span class="brand-mark" aria-hidden="true">U</span><span><span class="brand-name">UZEL PRESTİJ GARAJ</span><span class="brand-sub">SAMANDAĞ · HATAY</span></span></a>
+          <p>Yolculuğunuzda güven, konfor ve prestij. Araç kiralama, oto yıkama ve tamir hizmetleriyle Kuşalanı ve çevresindeyiz.</p>
+          <div class="socials" aria-label="Sosyal medya"><a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">IG</a><a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">f</a><a href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">WA</a></div>
         </div>
-        <div class="footer-column">
-          <h3>Hızlı Linkler</h3>
-          <nav class="footer-links" aria-label="Alt menü">
-            <a href="#anasayfa">Ana Sayfa</a><a href="#hizmetler">Hizmetler</a><a href="#araclar">Araçlar</a><a href="#rezervasyon">Rezervasyon</a>
-          </nav>
-        </div>
-        <div class="footer-column">
-          <h3>İletişim</h3>
-          <div class="footer-links">
-            <a href="tel:+905395253091">0539 525 30 91</a>
-            <span>Samandağ / Hatay</span>
-            <a href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          </div>
-        </div>
+        <div><h3>Hızlı Linkler</h3><div class="footer-links"><a href="#anasayfa">Ana Sayfa</a><a href="#hizmetler">Hizmetler</a><a href="#filo">Araç Filosu</a><a href="#rezervasyon">Rezervasyon</a></div></div>
+        <div><h3>İletişim</h3><div class="footer-links"><a href="tel:+905395253091">0539 525 30 91</a><a href="#iletisim">Samandağ / Hatay</a><a href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer">WhatsApp'tan yazın</a></div></div>
       </div>
-      <div class="footer-bottom">© 2026 Uzel Prestij Garaj. Tüm hakları saklıdır.</div>
+      <div class="footer-bottom">© 2026 Uzel Prestij Garaj — Tüm hakları saklıdır.</div>
     </div>
   </footer>
+  </div>
 
-  <a class="floating-whatsapp" href="https://wa.me/905395253091" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp üzerinden bize ulaşın">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 11.7a8.4 8.4 0 0 1-12.4 7.4L3 20.4l1.3-4.9a8.4 8.4 0 1 1 16.2-3.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.2 7.8c.2-.4.4-.4.7-.4h.4c.2 0 .3.1.4.4l.7 1.7c.1.2.1.4-.1.6l-.5.6c-.2.2-.2.4 0 .6.5.9 1.2 1.5 2.1 2 .2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .3-.2 1-.7 1.4-.5.5-1.3.7-2 .5-1-.2-2.2-.7-3.5-1.9-1.5-1.3-2.5-3-2.6-4.1-.1-.9.4-1.4.8-1.7Z" fill="currentColor"/></svg>
-  </a>
+  <a class="whatsapp-float" href="https://wa.me/905395253091?text=Merhaba%2C%20Uzel%20Prestij%20Garaj%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp üzerinden iletişime geç">◉</a>
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    const client = new Appwrite.Client()
-      .setEndpoint('https://fra.cloud.appwrite.io/v1')
-      .setProject('6adc313d00284f815636');
-    const databases = new Appwrite.Databases(client);
-    const databaseId = '6adc341c0019de383121';
-    const vehiclesCollectionId = '6adc342900241d2925e6';
-    const bookingsCollectionId = '6adc36120001b0ca63ad';
+    (() => {
+      'use strict';
+      const firebaseConfig = {
+        apiKey: "AIzaSyA_RJyKfjzv2lICbo27GlsyxcEx6A4trRo",
+        authDomain: "uzel-prestij-garaj.firebaseapp.com",
+        projectId: "uzel-prestij-garaj",
+        storageBucket: "uzel-prestij-garaj.firebasestorage.app",
+        messagingSenderId: "970518621544",
+        appId: "1:970518621544:web:73109bc786ecce02293add",
+        measurementId: "G-Q92PWXWTDR"
+      };
+      const fleetGrid = document.getElementById('fleetGrid');
+      const vehicleSelect = document.getElementById('vehicleSelect');
+      const bookingForm = document.getElementById('bookingForm');
+      const bookingMessage = document.getElementById('bookingMessage');
+      const bookingSubmit = document.getElementById('bookingSubmit');
+      let db;
+      let vehicles = [];
 
-    const fleetGrid = document.getElementById('fleetGrid');
-    const vehicleSelect = document.getElementById('vehicleSelect');
-    const bookingForm = document.getElementById('bookingForm');
-    const bookingSubmit = document.getElementById('bookingSubmit');
-    const formMessage = document.getElementById('formMessage');
-    const vehicles = [];
-    const fallbackVehicleImage = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=75';
-
-    function isAvailable(vehicle) {
-      if (vehicle.aktif === false || vehicle.vitrinde === false) return false;
-      const status = String(vehicle.durum ?? 'aktif').trim().toLocaleLowerCase('tr-TR');
-      return ['aktif', 'active', 'müsait', 'musait', 'uygun'].includes(status);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, character => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[character]);
-    }
-
-    function renderFleet() {
-      fleetGrid.replaceChildren();
-      if (!vehicles.length) {
-        const message = document.createElement('p');
-        message.className = 'fleet-status';
-        message.textContent = 'Şu anda listelenecek müsait aracımız bulunmuyor. Bilgi almak için bizi arayabilirsiniz.';
-        fleetGrid.append(message);
-        return;
+      function safeText(value, fallback = '') {
+        return value === undefined || value === null ? fallback : String(value);
       }
-
-      vehicles.forEach(({ id, data }) => {
-        const name = [data.marka, data.model].filter(Boolean).join(' ') || data.ad || 'Kiralık araç';
-        const price = Number(data.fiyat ?? data.gunluk_ucret ?? data.gunlukUcret) || 0;
-        const photo = data.resim || data.foto || data.gorsel || data.image || fallbackVehicleImage;
-        const card = document.createElement('article');
-        card.className = 'vehicle-card';
-        card.innerHTML = `
-          <img class="vehicle-image" src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" loading="lazy">
-          <div class="vehicle-content">
-            <div class="vehicle-meta"><span>Uzel Prestij Garaj</span><span>${escapeHtml(data.yil || 'Model yılı belirtilmemiş')}</span></div>
-            <h3>${escapeHtml(name)}</h3>
-            <div class="vehicle-bottom">
-              <span class="vehicle-price">${price.toLocaleString('tr-TR')} ₺ <small>/ günlük</small></span>
-              <button class="button button-gold rent-button" type="button" data-vehicle-id="${escapeHtml(id)}">Kirala</button>
-            </div>
-          </div>`;
-        const image = card.querySelector('.vehicle-image');
-        image.addEventListener('error', () => { image.src = fallbackVehicleImage; }, { once: true });
-        card.querySelector('.rent-button').addEventListener('click', () => {
-          vehicleSelect.value = id;
-          document.getElementById('serviceType').value = 'Kiralama';
-          document.getElementById('rezervasyon').scrollIntoView({ behavior: 'smooth' });
-          document.getElementById('customerName').focus({ preventScroll: true });
-        });
-        fleetGrid.append(card);
-      });
-    }
-
-    async function loadVehicles() {
-      try {
-        const response = await databases.listDocuments(databaseId, vehiclesCollectionId);
-        response.documents.forEach(record => {
-          const data = record;
-          if (isAvailable(data)) vehicles.push({ id: record.$id, data });
-        });
-        vehicles.sort((first, second) => String(first.data.marka || '').localeCompare(String(second.data.marka || ''), 'tr'));
+      function isAvailable(data) {
+        const status = String(data.durum || data.aracDurumu || '').trim().toLocaleLowerCase('tr-TR');
+        const unavailable = ['kirada','yikamada','yıkamada','serviste','bakimda','bakımda','pasif','rented','washing','service','inactive'];
+        return !unavailable.includes(status) &&
+          data.aktif !== false && data.aktif !== 'false' &&
+          data.vitrinde !== false && data.vitrinde !== 'false';
+      }
+      function escapeHtml(value) {
+        return safeText(value).replace(/[&<>"']/g, character => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[character]);
+      }
+      function formatPrice(value) {
+        const price = Number(value);
+        return Number.isFinite(price) && price > 0
+          ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(price)
+          : 'Fiyat sorunuz';
+      }
+      function vehicleName(data) {
+        return [data.marka, data.model].filter(Boolean).join(' ') ||
+          data.ad || data.baslik || data.aracAdi || 'Araç';
+      }
+      function renderVehicles() {
+        vehicleSelect.replaceChildren(new Option('Araç seçiniz', ''));
+        if (!vehicles.length) {
+          fleetGrid.innerHTML = '<div class="empty-state">Şu anda listelenecek müsait araç bulunmuyor. Araç seçenekleri için bizi arayabilirsiniz.</div>';
+          return;
+        }
+        const fragment = document.createDocumentFragment();
         vehicles.forEach(({ id, data }) => {
-          const option = document.createElement('option');
-          option.value = id;
-          option.textContent = [data.marka, data.model].filter(Boolean).join(' ') || data.ad || 'Kiralık araç';
-          vehicleSelect.append(option);
+          const name = vehicleName(data);
+          const year = safeText(data.yil || data.yilModel || data.modelYili, '—');
+          const price = data.fiyat ?? data.gunlukUcret ?? data.gunlukFiyat;
+          const image = data.foto || data.resim || data.image || data.gorsel || '';
+          const option = new Option(`${name}${year !== '—' ? ` · ${year}` : ''}`, id);
+          vehicleSelect.add(option);
+          const card = document.createElement('article');
+          card.className = 'vehicle-card reveal';
+          card.dataset.vehicleId = id;
+          const imageContent = image
+            ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)} kiralık araç" loading="lazy">`
+            : '<div style="height:100%;display:grid;place-items:center;color:#fbbf24;font-size:44px" aria-hidden="true">🚘</div>';
+          card.innerHTML = `
+            <div class="vehicle-image">${imageContent}<span class="vehicle-badge">MÜSAİT</span></div>
+            <div class="vehicle-info">
+              <div class="vehicle-title"><h3>${escapeHtml(name)}</h3><span class="vehicle-year">${escapeHtml(year)}</span></div>
+              <div class="vehicle-meta">${data.vites ? `<span>${escapeHtml(data.vites)}</span>` : ''}${data.yakit ? `<span>${escapeHtml(data.yakit)}</span>` : ''}${data.koltuk ? `<span>${escapeHtml(data.koltuk)} kişi</span>` : ''}</div>
+              <div class="vehicle-bottom"><div class="vehicle-price"><strong>${escapeHtml(formatPrice(price))}</strong> <small>${Number(price) > 0 ? '₺ / gün' : ''}</small></div><button class="button gold rent-button" type="button" data-vehicle-id="${escapeHtml(id)}">Kirala</button></div>
+            </div>`;
+          fragment.appendChild(card);
         });
-        renderFleet();
-      } catch (error) {
-        console.error('Araç filosu yüklenemedi:', error);
-        fleetGrid.innerHTML = '<p class="fleet-status">Araç listesi şu anda yüklenemiyor. Lütfen daha sonra tekrar deneyin veya bizi arayın.</p>';
-      }
-    }
-
-    function showFormMessage(message, type) {
-      formMessage.textContent = message;
-      formMessage.className = `form-message ${type}`;
-      formMessage.hidden = false;
-    }
-
-    bookingForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (!bookingForm.reportValidity()) return;
-
-      bookingSubmit.disabled = true;
-      bookingSubmit.textContent = 'Gönderiliyor…';
-      formMessage.hidden = true;
-      const selectedVehicle = vehicles.find(vehicle => vehicle.id === vehicleSelect.value);
-      const selectedService = document.getElementById('serviceType').value;
-
-      try {
-        await databases.createDocument(databaseId, bookingsCollectionId, Appwrite.ID.unique(), {
-          musteri_adi: document.getElementById('customerName').value.trim(),
-          telefon: document.getElementById('customerPhone').value.trim(),
-          arac_plaka: selectedVehicle ? selectedVehicle.data.plaka || '' : '',
-          tarih: document.getElementById('bookingDate').value,
-          hizmet: selectedService,
-          durum: 'Onaylandı'
+        fleetGrid.replaceChildren(fragment);
+        fleetGrid.querySelectorAll('.rent-button').forEach(button => {
+          button.addEventListener('click', () => {
+            vehicleSelect.value = button.dataset.vehicleId;
+            document.getElementById('serviceSelect').value = 'Kiralama';
+            document.getElementById('rezervasyon').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('customerName').focus({ preventScroll: true });
+          });
         });
-        bookingForm.reset();
-        showFormMessage('Talebiniz alındı! En kısa sürede sizi arayacağız.', 'success');
-      } catch (error) {
-        console.error('Rezervasyon talebi gönderilemedi:', error);
-        showFormMessage('Talebiniz gönderilemedi. Lütfen tekrar deneyin veya bizi telefonla arayın.', 'error');
-      } finally {
-        bookingSubmit.disabled = false;
-        bookingSubmit.textContent = 'Rezervasyon Yap';
+        applyDynamicMotion();
       }
-    });
+      async function loadVehicles() {
+        try {
+          if (!window.firebase) throw new Error('Firebase SDK yüklenemedi.');
+          if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+          db = firebase.firestore();
+          const snapshot = await db.collection('araclar').get();
+          vehicles = snapshot.docs
+            .map(document => ({ id: document.id, data: document.data() || {} }))
+            .filter(({ data }) => isAvailable(data));
+          renderVehicles();
+        } catch (error) {
+          console.error('Müsait araçlar yüklenemedi:', error);
+          fleetGrid.innerHTML = '<div class="empty-state">Araç listesi şu anda yüklenemedi. Lütfen daha sonra tekrar deneyin veya bizi arayın.</div>';
+          vehicleSelect.replaceChildren(new Option('Araç listesi yüklenemedi', ''));
+        }
+      }
+      function setMessage(message, type = '') {
+        bookingMessage.textContent = message;
+        bookingMessage.className = `form-message${type ? ` ${type}` : ''}`;
+      }
+      bookingForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        setMessage('');
+        const selectedVehicle = vehicles.find(vehicle => vehicle.id === vehicleSelect.value);
+        if (!db || !selectedVehicle) {
+          setMessage('Lütfen listeden müsait bir araç seçin. Araç listesi yüklenmemiş olabilir.', 'error');
+          return;
+        }
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const date = document.getElementById('bookingDate').value;
+        const service = document.getElementById('serviceSelect').value;
+        if (!name || !phone || !date || !service) {
+          setMessage('Lütfen zorunlu alanların tamamını doldurun.', 'error');
+          return;
+        }
+        bookingSubmit.disabled = true;
+        bookingSubmit.textContent = 'Gönderiliyor...';
+        try {
+          await db.collection('randevular').add({
+            ad: name,
+            telefon: phone,
+            arac: vehicleName(selectedVehicle.data),
+            aracId: selectedVehicle.id,
+            tarih: date,
+            baslangic: date,
+            hizmetTuru: service,
+            hizmet: service,
+            not: document.getElementById('bookingNotes').value.trim(),
+            durum: 'beklemede',
+            kayitZamani: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          bookingForm.reset();
+          setMessage('Talebiniz alındı! En kısa sürede sizi arayacağız.', 'success');
+        } catch (error) {
+          console.error('Rezervasyon talebi kaydedilemedi:', error);
+          setMessage('Talebiniz gönderilemedi. Lütfen telefonla bizimle iletişime geçin.', 'error');
+        } finally {
+          bookingSubmit.disabled = false;
+          bookingSubmit.innerHTML = 'Talep Gönder <span aria-hidden="true">→</span>';
+        }
+      });
 
-    const menuToggle = document.getElementById('menuToggle');
-    const mainNav = document.getElementById('mainNav');
-    menuToggle.addEventListener('click', () => {
-      const isOpen = mainNav.classList.toggle('open');
-      menuToggle.setAttribute('aria-expanded', String(isOpen));
-      menuToggle.setAttribute('aria-label', isOpen ? 'Menüyü kapat' : 'Menüyü aç');
-    });
-    mainNav.addEventListener('click', event => {
-      if (event.target instanceof HTMLAnchorElement) {
-        mainNav.classList.remove('open');
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      function closeMenu() {
         menuToggle.setAttribute('aria-expanded', 'false');
         menuToggle.setAttribute('aria-label', 'Menüyü aç');
+        navLinks.classList.remove('open');
+        document.body.classList.remove('menu-open');
       }
-    });
+      menuToggle.addEventListener('click', () => {
+        const expanded = menuToggle.getAttribute('aria-expanded') !== 'true';
+        menuToggle.setAttribute('aria-expanded', String(expanded));
+        menuToggle.setAttribute('aria-label', expanded ? 'Menüyü kapat' : 'Menüyü aç');
+        navLinks.classList.toggle('open', expanded);
+        document.body.classList.toggle('menu-open', expanded);
+      });
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 740) closeMenu();
+      });
+      window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+      }, { passive: true });
 
-    loadVehicles();
+      document.querySelectorAll('[data-service]').forEach(link => {
+        link.addEventListener('click', () => {
+          document.getElementById('serviceSelect').value = link.dataset.service;
+        });
+      });
+      const today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      document.getElementById('bookingDate').min = today.toISOString().slice(0, 10);
+
+      function tiltCards() {
+        if (window.matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return;
+        document.querySelectorAll('.service-card, .vehicle-card').forEach(card => {
+          if (card.dataset.tiltBound) return;
+          card.dataset.tiltBound = 'true';
+          card.addEventListener('mousemove', event => {
+            const rect = card.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width;
+            const y = (event.clientY - rect.top) / rect.height;
+            card.style.transform = `perspective(900px) rotateX(${(0.5-y)*7}deg) rotateY(${(x-0.5)*8}deg) translateY(-3px)`;
+          });
+          card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+        });
+      }
+      function applyDynamicMotion() {
+        tiltCards();
+        if (window.gsap && window.ScrollTrigger) {
+          gsap.registerPlugin(ScrollTrigger);
+          const cards = gsap.utils.toArray('#fleetGrid .vehicle-card:not([data-scroll-animated])');
+          if (!cards.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          cards.forEach(card => { card.dataset.scrollAnimated = 'true'; });
+          const duration = window.matchMedia('(max-width: 740px)').matches ? .8 : 1;
+          gsap.fromTo(cards, {
+            opacity: 0,
+            y: 80,
+            rotateX: 5,
+            transformPerspective: 1000,
+            transformOrigin: '50% 100%'
+          }, {
+            opacity: 1,
+            y: 0,
+            rotateX: 0,
+            duration,
+            stagger: .15,
+            ease: 'power3.out',
+            clearProps: 'willChange',
+            scrollTrigger: {
+              trigger: '#filo',
+              start: 'top 85%',
+              end: 'bottom 20%',
+              toggleActions: 'play none none reverse'
+            }
+          });
+        }
+      }
+      function initAnimations() {
+        if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.querySelectorAll('.reveal').forEach(element => element.classList.add('is-visible'));
+          tiltCards();
+          return;
+        }
+        document.documentElement.classList.add('js-motion');
+        gsap.registerPlugin(ScrollTrigger);
+        const mobileMotion = window.matchMedia('(max-width: 740px)').matches;
+        const duration = mobileMotion ? .8 : 1;
+        const fromState = { opacity: 0, y: 80, rotateX: 5, transformPerspective: 1000, transformOrigin: '50% 100%' };
+        const toState = { opacity: 1, y: 0, rotateX: 0, duration, ease: 'power3.out' };
+        const heroItems = gsap.utils.toArray('#heroContent .hero-kicker, #heroContent h1, #heroContent .hero-copy, #heroContent .hero-actions, #heroContent .hero-proof');
+        gsap.fromTo(heroItems, fromState, {
+          ...toState,
+          stagger: .15,
+          delay: .12,
+          onStart: () => heroItems.forEach(item => item.classList.add('is-visible'))
+        });
+        gsap.fromTo('#heroContent', { y: 0, opacity: 1 }, {
+          y: 145, opacity: 0, ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+        });
+        gsap.to('#heroImage', {
+          yPercent: 12, scale: 1.16, ease: 'none',
+          scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+        });
+        const animatedGroups = [
+          { trigger: '#hizmetler', selector: '.section-heading, .service-card' },
+          { trigger: '#filo', selector: '.section-heading' },
+          { trigger: '.pickup-card', selector: '.pickup-card' },
+          { trigger: '#neden', selector: '.section-heading, .benefit' },
+          { trigger: '.discount-wrap', selector: '.discount-content' },
+          { trigger: '#rezervasyon', selector: '.booking-aside, .booking-form' },
+          { trigger: '#iletisim', selector: '.section-heading, .contact-card, .map-frame' },
+          { trigger: '.footer', selector: '.footer-grid > div, .footer-bottom' }
+        ];
+        animatedGroups.forEach(({ trigger, selector }) => {
+          const section = document.querySelector(trigger);
+          if (!section) return;
+          const items = gsap.utils.toArray(selector, section);
+          if (!items.length) return;
+          gsap.fromTo(items, fromState, {
+            ...toState,
+            stagger: .15,
+            onStart: () => items.forEach(item => item.classList.add('is-visible')),
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 85%',
+              end: 'bottom 20%',
+              toggleActions: 'play none none reverse'
+            }
+          });
+        });
+        tiltCards();
+      }
+      function initWebGLGallery() {
+        const canvas = document.getElementById('webgl');
+        if (!window.THREE || !window.gsap || !window.ScrollTrigger) {
+          console.error('3D galeri başlatılamadı: Three.js veya GSAP ScrollTrigger yüklenemedi.');
+          return;
+        }
+        try {
+          const carData = [
+            { brand: 'Renault', model: 'Clio', year: 2022, price: 750, image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=85' },
+            { brand: 'Fiat', model: 'Egea', year: 2023, price: 900, image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=85' },
+            { brand: 'Volkswagen', model: 'Passat', year: 2021, price: 1400, image: 'https://images.unsplash.com/photo-1616422285623-13ff0162193c?auto=format&fit=crop&w=1200&q=85' },
+            { brand: 'BMW', model: '3.20', year: 2023, price: 2000, image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=85' },
+            { brand: 'Mercedes', model: 'C200', year: 2024, price: 2500, image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=85' }
+          ];
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, .1, 100);
+          const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setClearColor(0x0a0f1e, 0);
+          renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+          scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+          const keyLight = new THREE.DirectionalLight(0xffd477, 2.8);
+          keyLight.position.set(4, 5, 7);
+          scene.add(keyLight);
+          const goldLight = new THREE.PointLight(0xfbbf24, 35, 25);
+          const blueLight = new THREE.PointLight(0x193b9a, 55, 30);
+          scene.add(goldLight, blueLight);
+          const isSmallScreen = window.matchMedia('(max-width: 740px)').matches;
+          const cards = [];
+          const cardWidth = isSmallScreen ? 3.1 : 4.15;
+          const cardHeight = isSmallScreen ? 2.12 : 2.78;
+          const cardPositions = carData.map((car, index) => {
+            const angle = (index - (carData.length - 1) / 2) * .12;
+            return {
+              x: isSmallScreen ? 0 : Math.sin(angle) * 2.3,
+              y: (index % 2 ? .32 : -.18) + (isSmallScreen ? -.18 : 0),
+              z: -index * 3.75
+            };
+          });
+          const particlePositions = new Float32Array(360 * 3);
+          for (let index = 0; index < 360; index += 1) {
+            particlePositions[index * 3] = (Math.random() - .5) * 22;
+            particlePositions[index * 3 + 1] = (Math.random() - .5) * 12;
+            particlePositions[index * 3 + 2] = 4 - Math.random() * 25;
+          }
+          const particleGeometry = new THREE.BufferGeometry();
+          particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+          const particles = new THREE.Points(
+            particleGeometry,
+            new THREE.PointsMaterial({ color: 0xc8a75a, size: .035, transparent: true, opacity: .62, depthWrite: false })
+          );
+          scene.add(particles);
+          function makeCardTexture(car, index) {
+            const art = document.createElement('canvas');
+            art.width = 1200;
+            art.height = 800;
+            const context = art.getContext('2d');
+            const gradient = context.createLinearGradient(0, 0, 1200, 800);
+            gradient.addColorStop(0, ['#172438','#1a2534','#18253b','#17243a','#202a39'][index]);
+            gradient.addColorStop(.58, '#101827');
+            gradient.addColorStop(1, '#080e19');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, art.width, art.height);
+            const light = context.createRadialGradient(850, 370, 20, 850, 370, 480);
+            light.addColorStop(0, 'rgba(251,191,36,.22)');
+            light.addColorStop(1, 'rgba(251,191,36,0)');
+            context.fillStyle = light;
+            context.fillRect(0, 0, art.width, art.height);
+            context.fillStyle = 'rgba(251,191,36,.86)';
+            context.fillRect(70, 72, 54, 4);
+            context.font = '700 27px Arial, sans-serif';
+            context.letterSpacing = '7px';
+            context.fillText('UZEL PRESTİJ GARAJ', 70, 125);
+            context.fillStyle = '#f8fafc';
+            context.font = '700 72px Arial, sans-serif';
+            context.letterSpacing = '0px';
+            context.fillText(car.brand, 70, 245);
+            context.font = '700 100px Arial, sans-serif';
+            context.fillText(car.model, 70, 350);
+            context.fillStyle = 'rgba(226,232,240,.72)';
+            context.font = '500 34px Arial, sans-serif';
+            context.fillText(String(car.year), 74, 410);
+
+            context.save();
+            context.translate(720, 440);
+            context.fillStyle = 'rgba(5,10,19,.94)';
+            context.beginPath();
+            context.moveTo(-320, 48);
+            context.lineTo(-280, -8);
+            context.quadraticCurveTo(-260, -45, -205, -58);
+            context.lineTo(-120, -72);
+            context.lineTo(-58, -132);
+            context.quadraticCurveTo(-40, -150, -5, -150);
+            context.lineTo(125, -150);
+            context.quadraticCurveTo(160, -150, 180, -120);
+            context.lineTo(245, -66);
+            context.lineTo(290, -48);
+            context.quadraticCurveTo(316, -35, 318, 8);
+            context.lineTo(318, 45);
+            context.quadraticCurveTo(305, 67, 280, 68);
+            context.lineTo(-282, 68);
+            context.quadraticCurveTo(-314, 67, -320, 48);
+            context.fill();
+            context.fillStyle = '#fbbf24';
+            context.globalAlpha = .75;
+            context.fillRect(-268, 3, 53, 7);
+            context.fillRect(248, 1, 42, 7);
+            context.globalAlpha = 1;
+            [-195, 196].forEach(wheelX => {
+              context.beginPath();
+              context.arc(wheelX, 62, 39, 0, Math.PI * 2);
+              context.fillStyle = '#080c13';
+              context.fill();
+              context.beginPath();
+              context.arc(wheelX, 62, 19, 0, Math.PI * 2);
+              context.fillStyle = '#fbbf24';
+              context.fill();
+            });
+            context.restore();
+
+            context.fillStyle = '#fbbf24';
+            context.font = '700 58px Arial, sans-serif';
+            context.fillText(`${new Intl.NumberFormat('tr-TR').format(car.price)} TL`, 70, 655);
+            context.fillStyle = 'rgba(226,232,240,.72)';
+            context.font = '500 29px Arial, sans-serif';
+            context.fillText('/ GÜN', 380, 655);
+            context.strokeStyle = 'rgba(251,191,36,.35)';
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(70, 700);
+            context.lineTo(1130, 700);
+            context.stroke();
+            const texture = new THREE.CanvasTexture(art);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            if (car.image) {
+              const photo = new Image();
+              photo.crossOrigin = 'anonymous';
+              photo.onload = () => {
+                const sourceRatio = photo.width / photo.height;
+                const photoX = 590;
+                const photoY = 130;
+                const photoWidth = 560;
+                const photoHeight = 425;
+                const targetRatio = photoWidth / photoHeight;
+                let sourceX = 0;
+                let sourceY = 0;
+                let sourceWidth = photo.width;
+                let sourceHeight = photo.height;
+                if (sourceRatio > targetRatio) {
+                  sourceWidth = photo.height * targetRatio;
+                  sourceX = (photo.width - sourceWidth) / 2;
+                } else {
+                  sourceHeight = photo.width / targetRatio;
+                  sourceY = (photo.height - sourceHeight) / 2;
+                }
+                context.save();
+                context.beginPath();
+                context.roundRect(photoX, photoY, photoWidth, photoHeight, 22);
+                context.clip();
+                context.drawImage(photo, sourceX, sourceY, sourceWidth, sourceHeight, photoX, photoY, photoWidth, photoHeight);
+                const overlay = context.createLinearGradient(photoX - 80, 0, photoX + 240, 0);
+                overlay.addColorStop(0, 'rgba(12,20,34,.86)');
+                overlay.addColorStop(.55, 'rgba(12,20,34,.22)');
+                overlay.addColorStop(1, 'rgba(12,20,34,0)');
+                context.fillStyle = overlay;
+                context.fillRect(photoX, photoY, photoWidth, photoHeight);
+                context.restore();
+                texture.needsUpdate = true;
+              };
+              photo.src = car.image;
+            }
+            return texture;
+          }
+          carData.forEach((car, index) => {
+            const position = cardPositions[index];
+            const card = new THREE.Group();
+            card.position.set(position.x, position.y, position.z);
+            card.rotation.y = (index - (carData.length - 1) / 2) * -.08;
+            const halo = new THREE.Mesh(
+              new THREE.PlaneGeometry(cardWidth + .34, cardHeight + .34),
+              new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: .11, depthWrite: false })
+            );
+            halo.position.z = -.09;
+            card.add(halo);
+            const frame = new THREE.Mesh(
+              new THREE.PlaneGeometry(cardWidth + .16, cardHeight + .16),
+              new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: .7, roughness: .3, emissive: 0x5e3800, emissiveIntensity: .25 })
+            );
+            frame.position.z = -.045;
+            card.add(frame);
+            const material = new THREE.MeshStandardMaterial({
+              map: makeCardTexture(car, index),
+              color: 0xffffff,
+              metalness: .16,
+              roughness: .52,
+              emissive: 0xfbbf24,
+              emissiveIntensity: .3
+            });
+            const face = new THREE.Mesh(new THREE.PlaneGeometry(cardWidth, cardHeight), material);
+            face.position.z = .005;
+            card.add(face);
+            const reflectionMaterial = material.clone();
+            reflectionMaterial.transparent = true;
+            reflectionMaterial.opacity = .16;
+            reflectionMaterial.depthWrite = false;
+            const reflection = new THREE.Mesh(new THREE.PlaneGeometry(cardWidth, cardHeight * .62), reflectionMaterial);
+            reflection.position.set(0, -cardHeight * .73, -.01);
+            reflection.scale.y = -1;
+            card.add(reflection);
+            scene.add(card);
+            cards.push({ group: card, material, data: car });
+          });
+
+          const first = cardPositions[0];
+          camera.position.set(first.x, first.y, 10);
+          const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reducedMotion) {
+            const cameraRoute = gsap.timeline({
+              defaults: { ease: 'none' },
+              scrollTrigger: {
+                trigger: document.body,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1
+              }
+            });
+            cameraRoute.to(camera.position, { z: -5, duration: 4.52 }, 0);
+            cameraRoute.to(camera.position, {
+              x: cardPositions[0].x,
+              y: cardPositions[0].y,
+              duration: .01
+            }, 0);
+            cardPositions.forEach((position, index) => {
+              const focusTime = index;
+              if (index > 0) {
+                cameraRoute.to(camera.position, {
+                  x: position.x,
+                  y: position.y,
+                  duration: 1
+                }, index - 1);
+              }
+              const card = cards[index];
+              const baseRotation = card.group.rotation.y;
+              cameraRoute.to(card.group.scale, {
+                x: 1.12, y: 1.12, z: 1.12, duration: .24
+              }, focusTime);
+              cameraRoute.to(card.group.rotation, {
+                y: baseRotation + .1, duration: .24
+              }, focusTime);
+              cameraRoute.to(cards[index].material, {
+                emissiveIntensity: .95, duration: .24
+              }, focusTime);
+              cameraRoute.to(card.group.scale, {
+                x: 1, y: 1, z: 1, duration: .24
+              }, focusTime + .28);
+              cameraRoute.to(card.group.rotation, {
+                y: baseRotation, duration: .24
+              }, focusTime + .28);
+              cameraRoute.to(card.material, {
+                emissiveIntensity: .3, duration: .24
+              }, focusTime + .28);
+            });
+            gsap.fromTo('#overlayCopy', { y: 22, scale: .96, opacity: .45 }, {
+              y: -22,
+              scale: 1.04,
+              opacity: .8,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: document.body,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1
+              }
+            });
+          }
+
+          let pointerX = 0;
+          let pointerY = 0;
+          let smoothedPointerX = 0;
+          let smoothedPointerY = 0;
+          if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+            window.addEventListener('mousemove', event => {
+              pointerX = (event.clientX / window.innerWidth - .5) * .5;
+              pointerY = (event.clientY / window.innerHeight - .5) * .22;
+            }, { passive: true });
+          }
+          const render = time => {
+            const seconds = time || 0;
+            goldLight.position.set(Math.sin(seconds * .45) * 5, 2.1 + Math.sin(seconds * .7) * .65, 3.5);
+            blueLight.position.set(Math.cos(seconds * .32) * 5, -1.2 + Math.sin(seconds * .52) * .8, -8);
+            smoothedPointerX += (pointerX - smoothedPointerX) * .035;
+            smoothedPointerY += (pointerY - smoothedPointerY) * .035;
+            camera.lookAt(camera.position.x + smoothedPointerX, camera.position.y + smoothedPointerY, camera.position.z - 10);
+            renderer.render(scene, camera);
+          };
+          gsap.ticker.add(render);
+          window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+            const nowSmall = window.matchMedia('(max-width: 740px)').matches;
+            cards.forEach(({ group }, index) => {
+              const position = cardPositions[index];
+              position.x = nowSmall ? 0 : Math.sin((index - (carData.length - 1) / 2) * .12) * 2.3;
+              position.y = (index % 2 ? .32 : -.18) + (nowSmall ? -.18 : 0);
+              group.position.set(position.x, position.y, position.z);
+              group.scale.setScalar(nowSmall ? .78 : 1);
+            });
+          }, { passive: true });
+        } catch (error) {
+          console.error('3D galeri oluşturulamadı:', error);
+        }
+      }
+      const hero = document.querySelector('.hero');
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        hero.addEventListener('mousemove', event => {
+          const rect = hero.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          document.getElementById('heroImage').style.transform = `scale(1.1) translate(${x * -14}px,${y * -10}px)`;
+        });
+        hero.addEventListener('mouseleave', () => { document.getElementById('heroImage').style.transform = ''; });
+      }
+
+      function initializeVisuals() {
+        initAnimations();
+        initWebGLGallery();
+      }
+      if (window.gsap && window.ScrollTrigger && window.THREE) {
+        initializeVisuals();
+      } else {
+        document.addEventListener('DOMContentLoaded', initializeVisuals, { once: true });
+      }
+      loadVehicles();
+    })();
   </script>
 </body>
 </html>
