@@ -509,9 +509,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
   function isActiveRental(data) {
     const status = String(data.durum ?? data.status ?? '').trim().toLocaleLowerCase('tr-TR');
-    if (status) return ['aktif', 'kirada'].includes(status);
-    const vehicle = vehicles.find(({ data: vehicleData }) => vehicleData.plaka === data.arac_plaka);
-    return Boolean(vehicle && vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) === 'kirada');
+    return ['aktif', 'kirada'].includes(status);
   }
 
   function statusLabel(status) {
@@ -872,7 +870,8 @@ tbody tr:last-child td { border-bottom: 0; }
           arac_plaka: aracPlaka,
           cikis_km: 0,
           giris_km: 0,
-          toplam_ucret: 0
+          toplam_ucret: 0,
+          durum: 'Kirada'
         }
       );
       rentalCreated = true;
@@ -1014,7 +1013,8 @@ tbody tr:last-child td { border-bottom: 0; }
           arac_plaka: currentVehicle.plaka || '',
           cikis_km: exitKm,
           giris_km: 0,
-          toplam_ucret: total
+          toplam_ucret: total,
+          durum: 'Kirada'
         }
       );
       await databases.updateDocument(
@@ -1057,6 +1057,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
   async function kiralamalariYukle() {
     const rentalRows = document.getElementById('activeRentalRows');
+    rentals = [];
     try {
       const response = await databases.listDocuments(
         appwriteDatabaseId,
@@ -1220,24 +1221,27 @@ tbody tr:last-child td { border-bottom: 0; }
     button.disabled = true;
     button.textContent = 'Kaydediliyor...';
     try {
+      const vehicleResponse = await databases.listDocuments(
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar
+      );
+      const vehicle = vehicleResponse.documents.find(
+        record => record.plaka === rental.data.arac_plaka
+      );
+      if (!vehicle) throw new Error(`Plaka için araç bulunamadı: ${rental.data.arac_plaka || 'boş plaka'}`);
       await databases.updateDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
         rentalId,
-        { giris_km: entryKm }
+        { durum: 'Tamamlandı', giris_km: entryKm }
       );
-      const vehicleId = rental.data.aracId || rental.data.vehicleId ||
-        vehicles.find(({ data }) => data.plaka === rental.data.arac_plaka)?.id;
-      if (vehicleId) {
-        await databases.updateDocument(
-          appwriteDatabaseId,
-          appwriteCollectionIds.araclar,
-          vehicleId,
-          { durum: 'musait' }
-        );
-      }
-      await fetchData();
-      showNotice('Araç teslim alındı.');
+      await databases.updateDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar,
+        vehicle.$id,
+        { durum: 'Müsait' }
+      );
+      window.location.reload();
     } catch (error) {
       console.error('Araç teslim alınamadı:', error);
       showNotice(`Araç teslim alınamadı: ${error.message}`, true);
