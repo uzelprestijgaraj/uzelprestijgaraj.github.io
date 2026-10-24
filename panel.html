@@ -9,16 +9,17 @@
 <script>
   const client = new Appwrite.Client()
     .setEndpoint('https://fra.cloud.appwrite.io/v1')
-    .setProject('6ada441b0024cad62064');
+    .setProject('6adc313d00284f815636');
   const databases = new Appwrite.Databases(client);
   const storage = new Appwrite.Storage(client);
   const account = new Appwrite.Account(client);
-  const appwriteDatabaseId = '6ada451700215ff02c73';
+  const appwriteDatabaseId = '6adc341c0019de383121';
   const appwriteCollectionIds = {
-    araclar: '6adae45f0033f75b199f',
-    kiralamalar: '6adafcff002c257f2765',
-    randevular: '6adafc53000653f16991'
+    araclar: '6adc342900241d2925e6',
+    kiralamalar: '6adc36120001b0ca63ad',
+    randevular: '6adc34ef0013163e98d4'
   };
+  const appwriteImageBucketId = '6adc3993003a1361a992';
   const authReady = (async () => {
     try {
       await account.get();
@@ -937,8 +938,8 @@ tbody tr:last-child td { border-bottom: 0; }
     const vehicleRows = document.getElementById('vehicleRows');
     try {
       const response = await databases.listDocuments(
-        '6ada451700215ff02c73',
-        '6adae45f0033f75b199f'
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar
       );
       const records = response.documents;
       console.log('Gelen araçlar:', records);
@@ -1135,14 +1136,14 @@ tbody tr:last-child td { border-bottom: 0; }
       const imageUrl = document.getElementById('carImageUrl').value.trim();
       let resimUrl = '';
       if (file) {
-        const uploadedFile = await storage.createFile('6adb0003003baa487610', 'unique()', file);
-        resimUrl = `${client.config.endpoint}/storage/buckets/6adb0003003baa487610/files/${uploadedFile.$id}/view?project=${client.config.project}`;
+        const uploadedFile = await storage.createFile(appwriteImageBucketId, 'unique()', file);
+        resimUrl = storage.getFileView(appwriteImageBucketId, uploadedFile.$id).toString();
       } else if (imageUrl) {
         resimUrl = imageUrl;
       }
       await databases.createDocument(
-        '6ada451700215ff02c73',
-        '6adae45f0033f75b199f',
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar,
         'unique()',
         {
           plaka: document.getElementById('plaka').value,
