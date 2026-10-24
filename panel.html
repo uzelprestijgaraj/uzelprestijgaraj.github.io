@@ -17,8 +17,7 @@
   const appwriteCollectionIds = {
     araclar: '6adc342900241d2925e6',
     kiralamalar: '6adc36120001b0ca63ad',
-    randevular: '6adc34ef0013163e98d4',
-    musteriler: '6adc5d76001dd75a9362'
+    randevular: '6adc34ef0013163e98d4'
   };
   const appwriteImageBucketId = '6adc3993003a1361a992';
   const authReady = (async () => {
@@ -348,7 +347,6 @@ tbody tr:last-child td { border-bottom: 0; }
         <button class="tab active" id="vehiclesTab" type="button" role="tab" aria-selected="true" aria-controls="vehiclesPanel">ARAÇ FİLOSU</button>
         <button class="tab" id="rentalsTab" type="button" role="tab" aria-selected="false" aria-controls="rentalsPanel">KİRALAMALAR</button>
         <button class="tab" id="bookingsTab" type="button" role="tab" aria-selected="false" aria-controls="bookingsPanel">REZERVASYONLAR</button>
-        <button class="tab" id="customersTab" type="button" role="tab" aria-selected="false" aria-controls="customersPanel">MÜŞTERİLER</button>
       </div>
 
       <section class="tab-panel" id="vehiclesPanel" role="tabpanel" aria-labelledby="vehiclesTab">
@@ -379,24 +377,13 @@ tbody tr:last-child td { border-bottom: 0; }
       </section>
 
       <section class="tab-panel" id="rentalsPanel" role="tabpanel" aria-labelledby="rentalsTab" hidden>
-        <div class="section-title"><div><h2>Aktif kiralamalar</h2><p>Kiralamaları başlatın, teslim alın ve kilometre bilgilerini takip edin.</p></div></div>
+        <div class="section-title"><div><h2>Kiralamalar</h2><p>Kiralama tarihlerini, ücretleri ve teslim durumlarını yönetin.</p></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>MÜŞTERİ</th><th>ARAÇ</th><th>TOPLAM ÜCRET</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
-            <tbody id="activeRentalRows"><tr><td colspan="5" class="empty">Kiralamalar yükleniyor...</td></tr></tbody>
+            <thead><tr><th>MÜŞTERİ ADI</th><th>TELEFON</th><th>ARAÇ PLAKASI</th><th>BAŞLANGIÇ TARİHİ</th><th>BİTİŞ TARİHİ</th><th>TOPLAM ÜCRET</th><th>DURUM</th><th>İŞLEMLER</th></tr></thead>
+            <tbody id="activeRentalRows"><tr><td colspan="8" class="empty">Kiralamalar yükleniyor...</td></tr></tbody>
           </table>
         </div>
-        <div class="form-actions"><button class="button button-gold" id="openRentalDialog" type="button">Yeni kiralama</button></div>
-        <form class="form-card" id="returnForm">
-          <h3>Araç teslim al</h3>
-          <div class="form-grid">
-            <div class="field full"><label for="returnRental">Aktif kiralama</label><select id="returnRental" required><option value="">Kiralama seçin</option></select></div>
-            <div class="field"><label for="returnKm">Giriş KM</label><input id="returnKm" type="number" min="0" step="1" required></div>
-            <div class="field"><label for="returnFuel">Yakıt durumu</label><select id="returnFuel" required><option value="">Seçin</option><option value="dolu">Dolu</option><option value="3/4">3/4</option><option value="1/2">1/2</option><option value="1/4">1/4</option><option value="bos">Boş</option></select></div>
-            <div class="field full"><label for="returnDamage">Hasar notu</label><textarea id="returnDamage" rows="2" placeholder="Hasar yoksa boş bırakın"></textarea></div>
-          </div>
-          <div class="form-actions"><button class="button button-gold" id="saveReturn" type="submit">Teslim Al</button></div>
-        </form>
       </section>
 
       <section class="tab-panel" id="bookingsPanel" role="tabpanel" aria-labelledby="bookingsTab" hidden>
@@ -423,25 +410,6 @@ tbody tr:last-child td { border-bottom: 0; }
         </form>
       </section>
 
-      <section class="tab-panel" id="customersPanel" role="tabpanel" aria-labelledby="customersTab" hidden>
-        <div class="section-title"><div><h2>Müşteriler</h2><p>Müşteri kayıtlarını görüntüleyin ve yeni kayıt ekleyin.</p></div></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>AD SOYAD</th><th>TELEFON</th><th>TC KİMLİK</th><th>EHLİYET NO</th></tr></thead>
-            <tbody id="customerRows"><tr><td colspan="4" class="empty">Müşteriler yükleniyor...</td></tr></tbody>
-          </table>
-        </div>
-        <form class="form-card" id="customerForm">
-          <h3>Yeni Müşteri Ekle</h3>
-          <div class="form-grid">
-            <div class="field"><label for="customerFullName">Ad Soyad</label><input id="customerFullName" name="ad_soyad" required autocomplete="name"></div>
-            <div class="field"><label for="customerPhoneNumber">Telefon</label><input id="customerPhoneNumber" name="telefon" type="tel" required autocomplete="tel"></div>
-            <div class="field"><label for="customerNationalId">TC Kimlik</label><input id="customerNationalId" name="tc_kimlik" required inputmode="numeric" maxlength="11"></div>
-            <div class="field"><label for="customerLicenseNumber">Ehliyet No</label><input id="customerLicenseNumber" name="ehliyet_no" required></div>
-          </div>
-          <div class="form-actions"><button class="button button-gold" id="saveCustomer" type="submit">Müşteri Ekle</button></div>
-        </form>
-      </section>
     </section>
   </main>
 
@@ -451,17 +419,30 @@ tbody tr:last-child td { border-bottom: 0; }
         <h3 id="rentalDialogTitle">Yeni kiralama</h3>
         <button class="button button-quiet" id="closeRentalDialog" type="button" aria-label="Kapat">Kapat</button>
       </div>
+      <input id="rentalVehicleId" type="hidden">
       <div class="form-grid">
-        <div class="field"><label for="rentalCustomer">Müşteri</label><select id="rentalCustomer" required><option value="">Müşteri seçin</option></select></div>
-        <div class="field"><label for="rentalVehicle">Müsait araç</label><select id="rentalVehicle" required><option value="">Araç seçin</option></select></div>
-        <div class="field"><label for="rentalStart">Başlangıç tarihi</label><input id="rentalStart" type="date" required></div>
-        <div class="field"><label for="rentalEnd">Bitiş tarihi</label><input id="rentalEnd" type="date" required></div>
-        <div class="field"><label for="rentalDailyRate">Günlük ücret (₺)</label><input id="rentalDailyRate" type="number" min="0" step="0.01" required></div>
+        <div class="field"><label for="rentalCustomerName">Müşteri Adı</label><input id="rentalCustomerName" required autocomplete="name"></div>
+        <div class="field"><label for="rentalCustomerPhone">Telefon</label><input id="rentalCustomerPhone" type="tel" required autocomplete="tel"></div>
+        <div class="field"><label for="rentalStartDate">Başlangıç Tarihi</label><input id="rentalStartDate" type="date" required></div>
+        <div class="field"><label for="rentalEndDate">Bitiş Tarihi</label><input id="rentalEndDate" type="date" required></div>
         <div class="field"><label for="rentalExitKm">Çıkış KM</label><input id="rentalExitKm" type="number" min="0" step="1" required></div>
-        <div class="field"><label for="rentalTotal">Toplam ücret (₺)</label><input id="rentalTotal" type="number" readonly></div>
-        <div class="field full"><label for="rentalNotes">Notlar</label><textarea id="rentalNotes" rows="2" placeholder="İsteğe bağlı"></textarea></div>
+        <div class="field"><label for="rentalTotal">Toplam Ücret (₺)</label><input id="rentalTotal" type="number" min="0" step="0.01" required></div>
       </div>
       <div class="form-actions"><button class="button button-gold" id="saveRental" type="submit">Kiraya Ver</button></div>
+    </form>
+  </dialog>
+  <dialog class="rental-dialog" id="returnDialog" aria-labelledby="returnDialogTitle">
+    <form class="form-card" id="returnForm">
+      <div class="dialog-heading">
+        <h3 id="returnDialogTitle">Araç teslim al</h3>
+        <button class="button button-quiet" id="closeReturnDialog" type="button" aria-label="Kapat">Kapat</button>
+      </div>
+      <input id="returnRentalId" type="hidden">
+      <div class="form-grid">
+        <div class="field"><label for="returnKm">Giriş KM</label><input id="returnKm" type="number" min="0" step="1" required></div>
+        <div class="field"><label for="returnTotal">Toplam Ücret (₺)</label><input id="returnTotal" type="number" min="0" step="0.01" required></div>
+      </div>
+      <div class="form-actions"><button class="button button-gold" id="saveReturn" type="submit">Teslim Al</button></div>
     </form>
   </dialog>
 </div>
@@ -484,7 +465,6 @@ tbody tr:last-child td { border-bottom: 0; }
   let vehicles = [];
   let bookings = [];
   let rentals = [];
-  let customers = [];
 
   function showNotice(message, isError = false) {
     const notice = document.getElementById('notice');
@@ -725,26 +705,29 @@ tbody tr:last-child td { border-bottom: 0; }
   function renderRentals() {
     const tbody = document.getElementById('activeRentalRows');
     tbody.replaceChildren();
-    const active = rentals.filter(({ data }) => isActiveRental(data));
-    if (!active.length) return emptyTable(tbody, 5, 'Aktif kiralama yok.');
-    active.forEach(({ id, data }) => {
+    if (!rentals.length) return emptyTable(tbody, 8, 'Henüz kiralama kaydı bulunmuyor.');
+    rentals.forEach(({ id, data }) => {
       const row = tbody.insertRow();
       tableCell(row, data.musteri_adi || '—', 'name');
+      tableCell(row, data.telefon || '—');
       tableCell(row, data.arac_plaka || '—');
+      tableCell(row, formatDate(data.baslangic_tarihi || data.baslangic));
+      tableCell(row, formatDate(data.bitis_tarihi || data.bitis));
       tableCell(row, `${numericAmount(data).toLocaleString('tr-TR')} ₺`, 'price');
-      row.insertCell().appendChild(statusBadge('kirada'));
+      const status = String(data.durum || data.status || '—');
+      const normalizedStatus = normalizeStatus(status, status.toLocaleLowerCase('tr-TR'));
+      row.insertCell().appendChild(statusBadge(normalizedStatus));
       const actions = row.insertCell();
-      const returnButton = document.createElement('button');
-      returnButton.type = 'button';
-      returnButton.className = 'button button-gold';
-      returnButton.textContent = 'Teslim Al';
-      returnButton.addEventListener('click', () => {
-        document.getElementById('returnRental').value = id;
-        selectTab('rentals');
-        document.getElementById('returnForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        document.getElementById('returnKm').focus({ preventScroll: true });
-      });
-      actions.appendChild(returnButton);
+      if (isActiveRental(data)) {
+        const returnButton = document.createElement('button');
+        returnButton.type = 'button';
+        returnButton.className = 'button button-gold';
+        returnButton.textContent = 'Teslim Al';
+        returnButton.addEventListener('click', () => openReturnDialog(id, data));
+        actions.appendChild(returnButton);
+      } else {
+        actions.textContent = '—';
+      }
     });
   }
 
@@ -806,7 +789,9 @@ tbody tr:last-child td { border-bottom: 0; }
             id,
             data.musteri_adi,
             data.telefon || '',
-            data.arac_plaka || ''
+            data.arac_plaka || '',
+            data.baslangic_tarihi || data.baslangic || data.tarih || '',
+            data.bitis_tarihi || data.bitis || ''
           );
         } finally {
           convert.disabled = rentalCreated;
@@ -823,19 +808,6 @@ tbody tr:last-child td { border-bottom: 0; }
     });
   }
 
-  function renderCustomers() {
-    const tbody = document.getElementById('customerRows');
-    tbody.replaceChildren();
-    if (!customers.length) return emptyTable(tbody, 4, 'Henüz müşteri kaydı bulunmuyor.');
-    customers.forEach(({ data }) => {
-      const row = tbody.insertRow();
-      tableCell(row, data.ad_soyad, 'name');
-      tableCell(row, data.telefon);
-      tableCell(row, data.tc_kimlik);
-      tableCell(row, data.ehliyet_no);
-    });
-  }
-
   function inputDate(value) {
     if (!value) return '';
     if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
@@ -845,7 +817,12 @@ tbody tr:last-child td { border-bottom: 0; }
     return localDate.toISOString().slice(0, 10);
   }
 
-  async function kiralamayaDonustur(randevuId, musteriAdi, telefon, aracPlaka) {
+  function appwriteDate(value) {
+    const date = inputDate(value);
+    return date ? `${date}T00:00:00.000Z` : '';
+  }
+
+  async function kiralamayaDonustur(randevuId, musteriAdi, telefon, aracPlaka, baslangicTarihi, bitisTarihi) {
     const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
     if (!vehicle) {
       showNotice('Randevudaki plaka için müsait bir araç bulunamadı.', true);
@@ -871,7 +848,9 @@ tbody tr:last-child td { border-bottom: 0; }
           cikis_km: 0,
           giris_km: 0,
           toplam_ucret: 0,
-          durum: 'Kirada'
+          durum: 'Kirada',
+          baslangic_tarihi: appwriteDate(baslangicTarihi),
+          bitis_tarihi: appwriteDate(bitisTarihi || baslangicTarihi)
         }
       );
       rentalCreated = true;
@@ -899,102 +878,53 @@ tbody tr:last-child td { border-bottom: 0; }
     }
   }
 
-  function openRentalForm(vehicle, bookingData = {}) {
+  function openRentalForm(vehicle) {
     const form = document.getElementById('rentalForm');
-    const vehicleSelect = document.getElementById('rentalVehicle');
-    const customerName = bookingData.musteri_adi || '';
-    const customerSelect = document.getElementById('rentalCustomer');
     form.reset();
-    refreshOperationalSelects();
-    if (customerName && ![...customerSelect.options].some(option => option.value === customerName)) {
-      const customerOption = document.createElement('option');
-      customerOption.value = customerName;
-      customerOption.textContent = customerName;
-      customerSelect.appendChild(customerOption);
-    }
-    customerSelect.value = customerName;
-
-    if (vehicle) {
-      if (![...vehicleSelect.options].some(option => option.value === vehicle.id)) {
-        const option = document.createElement('option');
-        option.value = vehicle.id;
-        option.textContent = [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || vehicle.id;
-        vehicleSelect.appendChild(option);
-      }
-      vehicleSelect.value = vehicle.id;
-      document.getElementById('rentalDailyRate').value =
-        Number(vehicle.data.fiyat ?? vehicle.data.gunluk_ucret ?? vehicle.data.gunlukUcret ?? bookingData.gunlukUcret ?? 0);
-      document.getElementById('rentalExitKm').value =
-        Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? vehicle.data.kmGiris ?? 0);
-    }
-    document.getElementById('rentalStart').value = inputDate(bookingData.baslangic || bookingData.tarih);
-    document.getElementById('rentalEnd').value = inputDate(bookingData.bitis);
-    document.getElementById('rentalNotes').value = bookingData.not || '';
-    if (bookingData.toplamTutar ?? bookingData.toplamUcret) {
-      document.getElementById('rentalTotal').value = bookingData.toplamTutar ?? bookingData.toplamUcret;
-    } else {
-      updateRentalTotal();
-    }
+    document.getElementById('rentalVehicleId').value = vehicle.id;
+    document.getElementById('rentalExitKm').value = Number(
+      vehicle.data.cikis_km ?? vehicle.data.cikisKm ?? vehicle.data.kmCikis ??
+      vehicle.data.giris_km ?? vehicle.data.girisKm ?? vehicle.data.kmGiris ?? 0
+    );
     document.getElementById('rentalDialogTitle').textContent =
-      bookingData.id ? `Rezervasyonu kiralamaya dönüştür${customerName ? ` · ${customerName}` : ''}` : 'Yeni kiralama';
+      `Yeni kiralama · ${vehicle.data.plaka || vehicle.id}`;
     document.getElementById('rentalDialog').showModal();
   }
 
-  document.getElementById('openRentalDialog').addEventListener('click', () => {
-    document.getElementById('rentalForm').reset();
-    document.getElementById('rentalTotal').value = '';
-    document.getElementById('rentalDialogTitle').textContent = 'Yeni kiralama';
-    refreshOperationalSelects();
-    document.getElementById('rentalDialog').showModal();
-  });
   document.getElementById('closeRentalDialog').addEventListener('click', () => {
     document.getElementById('rentalDialog').close();
   });
 
-  document.getElementById('rentalVehicle').addEventListener('change', () => {
-    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
-    if (!vehicle) return;
-    document.getElementById('rentalDailyRate').value =
-      Number(vehicle.data.fiyat ?? vehicle.data.gunluk_ucret ?? vehicle.data.gunlukUcret ?? 0);
-    document.getElementById('rentalExitKm').value =
-      Number(vehicle.data.cikisKm ?? vehicle.data.kmCikis ?? vehicle.data.girisKm ?? vehicle.data.kmGiris ?? 0);
-    updateRentalTotal();
-  });
-
-  function updateRentalTotal() {
-    const start = dateValue(document.getElementById('rentalStart').value);
-    const end = dateValue(document.getElementById('rentalEnd').value);
-    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
-    const days = start && end && end >= start ? Math.max(1, Math.ceil((end - start) / 86400000)) : 0;
-    document.getElementById('rentalTotal').value =
-      days && Number.isFinite(dailyRate) ? (days * dailyRate).toFixed(2) : '';
+  function openReturnDialog(id, data) {
+    const form = document.getElementById('returnForm');
+    form.reset();
+    document.getElementById('returnRentalId').value = id;
+    document.getElementById('returnTotal').value = numericAmount(data);
+    document.getElementById('returnDialogTitle').textContent =
+      `Araç teslim al · ${data.arac_plaka || data.musteri_adi || ''}`;
+    document.getElementById('returnDialog').showModal();
   }
 
-  ['rentalStart', 'rentalEnd', 'rentalDailyRate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateRentalTotal);
+  document.getElementById('closeReturnDialog').addEventListener('click', () => {
+    document.getElementById('returnDialog').close();
   });
 
   document.getElementById('rentalForm').addEventListener('submit', async event => {
     event.preventDefault();
     const form = event.currentTarget;
     const button = document.getElementById('saveRental');
-    const customerName = document.getElementById('rentalCustomer').value;
-    const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
-    const customer = bookings.find(item =>
-      item.data.musteri_adi === customerName
-    ) || customers.find(item => item.data.ad_soyad === customerName);
-    const start = document.getElementById('rentalStart').value;
-    const end = document.getElementById('rentalEnd').value;
-    const startDate = dateValue(start);
-    const endDate = dateValue(end);
+    const customerName = document.getElementById('rentalCustomerName').value.trim();
+    const phone = document.getElementById('rentalCustomerPhone').value.trim();
+    const vehicleId = document.getElementById('rentalVehicleId').value;
+    const vehicle = vehicles.find(item => item.id === vehicleId);
+    const startDate = document.getElementById('rentalStartDate').value;
+    const endDate = document.getElementById('rentalEndDate').value;
     const exitKm = Number(document.getElementById('rentalExitKm').value);
-    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
     const total = Number(document.getElementById('rentalTotal').value);
-    if (!vehicle || !customerName || !startDate || !endDate || endDate < startDate ||
+    if (!vehicle || !customerName || !phone || !dateValue(startDate) || !dateValue(endDate) || endDate < startDate ||
         !Number.isFinite(exitKm) || exitKm < 0 ||
-        !Number.isFinite(dailyRate) || dailyRate < 0 ||
         !Number.isFinite(total) || total < 0) {
-      showNotice('Müşteri, müsait araç, tarih, çıkış KM ve ücret bilgilerini kontrol edin.', true);
+      showNotice('Müşteri, telefon, araç, tarih, çıkış KM ve toplam ücret bilgilerini kontrol edin.', true);
       return;
     }
 
@@ -1009,12 +939,14 @@ tbody tr:last-child td { border-bottom: 0; }
         'unique()',
         {
           musteri_adi: customerName,
-          telefon: customer?.data.telefon || customer?.data.phone || '',
+          telefon: phone,
           arac_plaka: currentVehicle.plaka || '',
           cikis_km: exitKm,
           giris_km: 0,
           toplam_ucret: total,
-          durum: 'Kirada'
+          durum: 'Kirada',
+          baslangic_tarihi: appwriteDate(startDate),
+          bitis_tarihi: appwriteDate(endDate)
         }
       );
       await databases.updateDocument(
@@ -1024,7 +956,6 @@ tbody tr:last-child td { border-bottom: 0; }
         { durum: 'kirada' }
       );
       form.reset();
-      document.getElementById('rentalTotal').value = '';
       document.getElementById('rentalDialog').close();
       showNotice('Kiralama kaydedildi.');
       await fetchData();
@@ -1068,7 +999,7 @@ tbody tr:last-child td { border-bottom: 0; }
     } catch (error) {
       console.error('Kiralamalar yüklenemedi:', error);
       rentals = [];
-      emptyTable(rentalRows, 5, `Kiralamalar yüklenemedi: ${error.message}`, true);
+      emptyTable(rentalRows, 8, `Kiralamalar yüklenemedi: ${error.message}`, true);
     }
   }
 
@@ -1093,26 +1024,8 @@ tbody tr:last-child td { border-bottom: 0; }
     }
   }
 
-  async function musterileriYukle() {
-    const customerRows = document.getElementById('customerRows');
-    try {
-      const response = await databases.listDocuments(
-        appwriteDatabaseId,
-        appwriteCollectionIds.musteriler
-      );
-      customers = response.documents
-        .map(record => ({ id: record.$id, data: record }))
-        .sort((a, b) => String(a.data.ad_soyad || '').localeCompare(String(b.data.ad_soyad || ''), 'tr'));
-      renderCustomers();
-    } catch (error) {
-      console.error('Müşteriler yüklenemedi:', error);
-      customers = [];
-      emptyTable(customerRows, 4, `Müşteriler yüklenemedi: ${error.message}`, true);
-    }
-  }
-
   async function fetchData() {
-    await Promise.all([araclariYukle(), kiralamalariYukle(), randevulariYukle(), musterileriYukle()]);
+    await Promise.all([araclariYukle(), kiralamalariYukle(), randevulariYukle()]);
     renderRentals();
     refreshOperationalSelects();
     updateStats();
@@ -1122,8 +1035,7 @@ tbody tr:last-child td { border-bottom: 0; }
     const tabs = [
       ['vehicles', 'vehiclesTab', 'vehiclesPanel'],
       ['rentals', 'rentalsTab', 'rentalsPanel'],
-      ['bookings', 'bookingsTab', 'bookingsPanel'],
-      ['customers', 'customersTab', 'customersPanel']
+      ['bookings', 'bookingsTab', 'bookingsPanel']
     ];
     tabs.forEach(([name, tabId, panelId]) => {
       const active = name === tab;
@@ -1135,7 +1047,6 @@ tbody tr:last-child td { border-bottom: 0; }
   document.getElementById('vehiclesTab').addEventListener('click', () => selectTab('vehicles'));
   document.getElementById('rentalsTab').addEventListener('click', () => selectTab('rentals'));
   document.getElementById('bookingsTab').addEventListener('click', () => selectTab('bookings'));
-  document.getElementById('customersTab').addEventListener('click', () => selectTab('customers'));
   document.getElementById('addVehicleShortcut').addEventListener('click', () => {
     selectTab('vehicles');
     document.getElementById('vehicleForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1163,59 +1074,24 @@ tbody tr:last-child td { border-bottom: 0; }
       label: [data.marka, data.model].filter(Boolean).join(' ') || data.ad || id,
       disabled: vehicleStatus(data.durum || data.aracDurumu) !== 'musait' || data.aktif === false || data.vitrinde === false || data.aktif === 'false'
     }));
-    const customerOptions = new Map();
-    customers.forEach(({ data }) => {
-      if (data.ad_soyad && !customerOptions.has(data.ad_soyad)) {
-        customerOptions.set(data.ad_soyad, { value: data.ad_soyad, label: data.ad_soyad });
-      }
-    });
-    [...bookings, ...rentals].forEach(({ data }) => {
-      const name = data.musteri_adi;
-      if (name && !customerOptions.has(name)) customerOptions.set(name, { value: name, label: name });
-    });
-    const rentalCustomerSelect = document.getElementById('rentalCustomer');
-    const selectedRentalCustomer = rentalCustomerSelect.value;
-    addOptions(rentalCustomerSelect, [...customerOptions.values()], 'Müşteri seçin', selectedRentalCustomer);
-    const rentalVehicleSelect = document.getElementById('rentalVehicle');
-    const selectedRentalVehicle = rentalVehicleSelect.value;
-    addOptions(rentalVehicleSelect, vehicleOptions.filter(option => !option.disabled), 'Müsait araç seçin', selectedRentalVehicle);
-
     const bookingVehicleSelect = document.getElementById('bookingVehicle');
     const selectedBookingVehicle = bookingVehicleSelect.value;
     addOptions(bookingVehicleSelect, vehicleOptions, 'Araç seçin', selectedBookingVehicle);
-
-    const activeRentalSelect = document.getElementById('returnRental');
-    const selectedRental = activeRentalSelect.value;
-    const activeOptions = rentals
-      .filter(({ data }) => isActiveRental(data))
-      .map(({ id, data }) => ({
-        value: id,
-        label: `${data.musteri_adi || 'Müşteri'} — ${data.arac_plaka || 'Araç'} (${formatDate(data.baslangic)})`
-      }));
-    addOptions(activeRentalSelect, activeOptions, 'Aktif kiralama seçin', selectedRental);
   }
-
-  function updateRentalTotal() {
-    const start = dateValue(document.getElementById('rentalStart').value);
-    const end = dateValue(document.getElementById('rentalEnd').value);
-    const dailyRate = Number(document.getElementById('rentalDailyRate').value);
-    const days = start && end && end >= start ? Math.max(1, Math.ceil((end - start) / 86400000)) : 0;
-    document.getElementById('rentalTotal').value =
-      days && Number.isFinite(dailyRate) ? (days * dailyRate).toFixed(2) : '';
-  }
-
-  ['rentalStart', 'rentalEnd', 'rentalDailyRate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateRentalTotal);
-  });
 
   document.getElementById('returnForm').addEventListener('submit', async event => {
     event.preventDefault();
     const button = document.getElementById('saveReturn');
-    const rentalId = document.getElementById('returnRental').value;
+    const rentalId = document.getElementById('returnRentalId').value;
     const rental = rentals.find(item => item.id === rentalId);
     const entryKm = Number(document.getElementById('returnKm').value);
+    const total = Number(document.getElementById('returnTotal').value);
     if (!rental || !Number.isFinite(entryKm) || entryKm < Number(rental.data.cikis_km ?? rental.data.cikisKm ?? 0)) {
       showNotice('Aktif kiralamayı ve çıkış KM değerinden düşük olmayan giriş KM bilgisini kontrol edin.', true);
+      return;
+    }
+    if (!Number.isFinite(total) || total < 0) {
+      showNotice('Toplam ücret geçerli bir sıfır veya pozitif sayı olmalıdır.', true);
       return;
     }
     button.disabled = true;
@@ -1233,7 +1109,7 @@ tbody tr:last-child td { border-bottom: 0; }
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
         rentalId,
-        { durum: 'Tamamlandı', giris_km: entryKm }
+        { durum: 'Tamamlandı', giris_km: entryKm, toplam_ucret: total }
       );
       await databases.updateDocument(
         appwriteDatabaseId,
@@ -1241,7 +1117,9 @@ tbody tr:last-child td { border-bottom: 0; }
         vehicle.$id,
         { durum: 'Müsait' }
       );
-      window.location.reload();
+      document.getElementById('returnDialog').close();
+      await fetchData();
+      showNotice('Araç teslim alındı.');
     } catch (error) {
       console.error('Araç teslim alınamadı:', error);
       showNotice(`Araç teslim alınamadı: ${error.message}`, true);
@@ -1338,39 +1216,6 @@ tbody tr:last-child td { border-bottom: 0; }
     } finally {
       button.disabled = false;
       button.textContent = 'Randevu Ekle';
-    }
-  });
-
-  document.getElementById('customerForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const button = document.getElementById('saveCustomer');
-    if (!form.reportValidity()) return;
-
-    button.disabled = true;
-    button.textContent = 'Kaydediliyor...';
-    try {
-      await databases.createDocument(
-        appwriteDatabaseId,
-        appwriteCollectionIds.musteriler,
-        'unique()',
-        {
-          ad_soyad: document.getElementById('customerFullName').value.trim(),
-          telefon: document.getElementById('customerPhoneNumber').value.trim(),
-          tc_kimlik: document.getElementById('customerNationalId').value.trim(),
-          ehliyet_no: document.getElementById('customerLicenseNumber').value.trim()
-        }
-      );
-      form.reset();
-      await musterileriYukle();
-      refreshOperationalSelects();
-      showNotice('Müşteri başarıyla eklendi.');
-    } catch (error) {
-      console.error('Müşteri eklenemedi:', error);
-      showNotice(`Müşteri eklenemedi: ${error.message}`, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = 'Müşteri Ekle';
     }
   });
 
