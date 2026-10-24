@@ -1,755 +1,176 @@
-Dosyanın tamamını okuyup mevcut Firebase yapılandırması da dahil olmak üzere eksiksiz içeriğini tek kod bloğunda paylaşacağım.
-
-Read , lines 1 to 180
-Completed with input: {
-  "path": "C:\\Users\\HP\\Desktop\\uzelprestijgaraj-site\\giris.html",
-  "view_range": [
-    1,
-    180
-  ]
-}
-
-Read , lines 181 to 360
-Completed with input: {
-  "path": "C:\\Users\\HP\\Desktop\\uzelprestijgaraj-site\\giris.html",
-  "view_range": [
-    181,
-    360
-  ]
-}
-
-Read , lines 361 to 540
-Completed with input: {
-  "path": "C:\\Users\\HP\\Desktop\\uzelprestijgaraj-site\\giris.html",
-  "view_range": [
-    361,
-    540
-  ]
-}
-
-Read , lines 541 to 740
-Completed with input: {
-  "path": "C:\\Users\\HP\\Desktop\\uzelprestijgaraj-site\\giris.html",
-  "view_range": [
-    541,
-    740
-  ]
-}
-
-Read 
-Completed with input: {
-  "path": "C:\\Users\\HP\\Desktop\\uzelprestijgaraj-site\\giris.html",
-  "forceReadLargeFiles": true
-}
-
-```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#090b0e">
-<title>Yönetici Girişi | Uzel Prestij Garaj</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #090b0e;
-  --surface: #11151a;
-  --surface-soft: #171c22;
-  --text: #f2f2ef;
-  --muted: #92989e;
-  --gold: #c9a96a;
-  --gold-light: #e8d2a5;
-  --line: rgba(255, 255, 255, .09);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 36px;
-  overflow-x: hidden;
-  perspective: 1800px;
-  color: var(--text);
-  background:
-    radial-gradient(ellipse at 16% 18%, rgba(201, 169, 106, .09), transparent 32%),
-    radial-gradient(ellipse at 82% 85%, rgba(55, 71, 83, .2), transparent 35%),
-    var(--bg);
-  font-family: 'DM Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-button, input { font: inherit; }
-
-.experience {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(390px, .83fr) minmax(0, 1.17fr);
-  width: min(1320px, 100%);
-  min-height: min(790px, calc(100vh - 72px));
-  overflow: hidden;
-  transform: perspective(1800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transform-style: preserve-3d;
-  transition: transform .25s cubic-bezier(.2, .75, .25, 1);
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-radius: 24px;
-  background: rgba(15, 18, 22, .88);
-  box-shadow: 0 40px 120px rgba(0, 0, 0, .56), 0 2px 12px rgba(255, 255, 255, .025) inset;
-  animation: card-appear .8s cubic-bezier(.2, .75, .25, 1) both;
-}
-
-.experience.is-tilting {
-  will-change: transform;
-  transition: transform .12s ease-out;
-}
-
-.login-panel {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transform-style: preserve-3d;
-  padding: clamp(36px, 5vw, 68px);
-  background:
-    radial-gradient(ellipse at 0 0, rgba(201, 169, 106, .07), transparent 40%),
-    linear-gradient(145deg, rgba(20, 24, 29, .98), rgba(13, 16, 20, .98));
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 13px;
-  transform: translateZ(38px);
-  color: var(--text);
-  text-decoration: none;
-  width: fit-content;
-}
-
-.brand-mark {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border: 1px solid rgba(201, 169, 106, .48);
-  border-radius: 13px;
-  color: var(--gold-light);
-  background: linear-gradient(145deg, rgba(201, 169, 106, .16), rgba(201, 169, 106, .035));
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .2), 0 0 24px rgba(201, 169, 106, .08);
-}
-
-.brand-mark svg { width: 23px; height: 23px; }
-.brand-name { display: grid; gap: 3px; }
-.brand-name strong {
-  font-family: 'Manrope', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: .16em;
-}
-.brand-name span {
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-}
-
-.form-wrap {
-  width: 100%;
-  max-width: 390px;
-  margin: 54px auto;
-  transform: translateZ(30px);
-}
-
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 19px;
-  color: var(--gold-light);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-}
-
-.eyebrow::before {
-  width: 23px;
-  height: 1px;
-  content: '';
-  background: var(--gold);
-}
-
-h1 {
-  margin-bottom: 13px;
-  font-family: 'Manrope', sans-serif;
-  font-size: clamp(30px, 3vw, 39px);
-  font-weight: 600;
-  letter-spacing: -.055em;
-  line-height: 1.18;
-}
-
-.intro {
-  max-width: 340px;
-  margin-bottom: 36px;
-  color: #a3a8ad;
-  font-size: 14px;
-  line-height: 1.75;
-}
-
-.field { margin-bottom: 22px; }
-
-label {
-  display: block;
-  margin-bottom: 9px;
-  color: #d4d6d6;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .08em;
-}
-
-.input-wrap { position: relative; }
-
-.input-icon {
-  position: absolute;
-  top: 50%;
-  left: 16px;
-  width: 17px;
-  height: 17px;
-  color: #737c83;
-  pointer-events: none;
-  transform: translateY(-50%);
-  transition: color .2s ease;
-}
-
-input {
-  width: 100%;
-  height: 54px;
-  padding: 0 16px 0 46px;
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-radius: 11px;
-  outline: none;
-  color: var(--text);
-  background: linear-gradient(110deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .018));
-  font-size: 13px;
-  transition: border-color .22s ease, background .22s ease, box-shadow .22s ease;
-}
-
-input::placeholder { color: #626a71; opacity: 1; }
-input:hover { border-color: rgba(255, 255, 255, .2); }
-input:focus {
-  border-color: rgba(201, 169, 106, .78);
-  background: rgba(255, 255, 255, .055);
-  box-shadow: 0 0 0 4px rgba(201, 169, 106, .1), 0 8px 25px rgba(0, 0, 0, .16);
-}
-
-.input-wrap:focus-within .input-icon { color: var(--gold-light); }
-
-.hata {
-  display: none;
-  margin: 0 0 19px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 104, 104, .24);
-  border-radius: 10px;
-  color: #ffaaaa;
-  background: rgba(150, 34, 34, .14);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.hata.goster { display: block; animation: appear .25s ease both; }
-
-.submit-btn {
-  position: relative;
-  display: flex;
-  width: 100%;
-  min-height: 56px;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  overflow: hidden;
-  margin-top: 7px;
-  border: 1px solid rgba(239, 215, 169, .55);
-  border-radius: 11px;
-  color: #17140e;
-  background: linear-gradient(110deg, #c4a064, #e3c78f 52%, #b99355);
-  box-shadow: 0 10px 28px rgba(174, 135, 68, .18), 0 1px 0 rgba(255, 255, 255, .36) inset;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-
-.submit-btn::before {
-  position: absolute;
-  top: -80%;
-  left: -45%;
-  width: 35%;
-  height: 260%;
-  content: '';
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .38), transparent);
-  transform: rotate(24deg);
-  transition: left .65s ease;
-}
-
-.submit-btn:hover {
-  box-shadow: 0 14px 34px rgba(174, 135, 68, .29), 0 1px 0 rgba(255, 255, 255, .4) inset;
-  filter: brightness(1.06);
-  transform: translateY(-2px);
-}
-.submit-btn:hover::before { left: 120%; }
-.submit-btn:active { transform: translateY(0); }
-.submit-btn:disabled { cursor: wait; filter: saturate(.55); opacity: .7; transform: none; }
-.submit-btn svg { width: 16px; height: 16px; }
-
-.back-link {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 9px;
-  color: #a3a8ad;
-  font-size: 12px;
-  text-decoration: none;
-  transition: color .2s ease, gap .2s ease;
-}
-.back-link svg { width: 15px; height: 15px; }
-.back-link:hover { gap: 13px; color: var(--gold-light); }
-
-.panel-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-top: 19px;
-  border-top: 1px solid var(--line);
-  color: #777f85;
-  font-size: 10px;
-  letter-spacing: .03em;
-}
-.panel-footer svg { width: 14px; height: 14px; color: var(--gold); }
-
-.visual-panel {
-  position: relative;
-  display: flex;
-  min-height: 100%;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  padding: 35px;
-  background: #12171b;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-}
-
-.visual-panel::before {
-  position: absolute;
-  inset: 0;
-  content: '';
-  background:
-    linear-gradient(90deg, rgba(9, 11, 14, .25), transparent 30%),
-    linear-gradient(0deg, rgba(6, 8, 10, .9), transparent 48%, rgba(7, 9, 12, .24)),
-    url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1800&q=88') center / cover;
-  animation: scene-arrive 1.2s ease both;
-  transform: translateZ(-22px) scale(1.035);
-}
-
-.visual-panel::after {
-  position: absolute;
-  inset: 0;
-  content: '';
-  background:
-    radial-gradient(ellipse at var(--pointer-x, 78%) var(--pointer-y, 43%), rgba(232, 210, 165, .12), transparent 34%),
-    radial-gradient(ellipse at 78% 43%, transparent 20%, rgba(5, 7, 9, .21) 75%),
-    linear-gradient(115deg, rgba(201, 169, 106, .11), transparent 40%);
-  transform: translateZ(5px);
-  pointer-events: none;
-}
-
-.visual-top, .visual-bottom { position: relative; z-index: 1; }
-.visual-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  transform: translateZ(38px);
-}
-
-.availability {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 13px;
-  border: 1px solid rgba(255, 255, 255, .16);
-  border-radius: 999px;
-  color: rgba(255, 255, 255, .86);
-  background: rgba(10, 13, 16, .34);
-  backdrop-filter: blur(15px);
-  font-size: 9px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.availability::before {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  content: '';
-  background: #80c49b;
-  box-shadow: 0 0 11px rgba(128, 196, 155, .75);
-}
-
-.image-index {
-  color: rgba(255, 255, 255, .66);
-  font-family: 'Manrope', sans-serif;
-  font-size: 10px;
-  letter-spacing: .19em;
-}
-.image-index strong { color: var(--gold-light); font-weight: 600; }
-
-.visual-bottom { padding: 0 3px 10px; transform: translateZ(52px); }
-.visual-kicker {
-  margin-bottom: 12px;
-  color: var(--gold-light);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .23em;
-  text-transform: uppercase;
-}
-.visual-bottom h2 {
-  max-width: 490px;
-  margin-bottom: 14px;
-  font-family: 'Manrope', sans-serif;
-  font-size: clamp(31px, 4vw, 54px);
-  font-weight: 500;
-  letter-spacing: -.055em;
-  line-height: 1.12;
-  text-wrap: balance;
-  text-shadow: 0 4px 25px rgba(0, 0, 0, .3);
-}
-.visual-bottom p {
-  max-width: 400px;
-  color: rgba(255, 255, 255, .72);
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.visual-rule {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  margin-top: 27px;
-  color: rgba(255, 255, 255, .68);
-  font-size: 9px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
-.visual-rule::before {
-  width: 40px;
-  height: 1px;
-  content: '';
-  background: var(--gold);
-}
-
-.corner-mark {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  right: 31px;
-  width: 61px;
-  height: 61px;
-  border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: 50%;
-  background: rgba(10, 13, 16, .17);
-  backdrop-filter: blur(10px);
-  transform: translateY(-50%) translateZ(75px);
-  animation: float 5s ease-in-out infinite;
-}
-.corner-mark::before, .corner-mark::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  content: '';
-  background: rgba(255, 255, 255, .72);
-  transform: translate(-50%, -50%);
-}
-.corner-mark::before { width: 18px; height: 1px; }
-.corner-mark::after { width: 1px; height: 18px; }
-
-@keyframes appear {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes card-appear {
-  from { opacity: 0; filter: blur(3px); }
-  to { opacity: 1; filter: blur(0); }
-}
-@keyframes scene-arrive {
-  from { opacity: .45; transform: translateZ(-22px) scale(1.09); }
-  to { opacity: 1; transform: translateZ(-22px) scale(1.035); }
-}
-@keyframes float {
-  0%, 100% { margin-top: 0; }
-  50% { margin-top: -10px; }
-}
-
-@media (max-width: 900px) {
-  body { padding: 22px; }
-  .experience {
-    grid-template-columns: minmax(330px, .95fr) minmax(0, 1.05fr);
-    min-height: min(760px, calc(100vh - 44px));
-  }
-  .login-panel { padding: 38px; }
-  .visual-panel { padding: 26px; }
-  .corner-mark { right: 20px; width: 48px; height: 48px; }
-}
-
-@media (max-width: 680px) {
-  body { display: block; padding: 14px; }
-  .experience {
-    display: flex;
-    min-height: 0;
-    flex-direction: column-reverse;
-    border-radius: 19px;
-  }
-  .login-panel { min-height: 630px; padding: 30px clamp(24px, 8vw, 42px); }
-  .form-wrap { margin: 45px auto; }
-  .visual-panel { min-height: 245px; padding: 19px 22px; }
-  .visual-panel::before { background-position: center 57%; }
-  .availability { padding: 8px 11px; font-size: 8px; }
-  .visual-bottom { padding-bottom: 1px; }
-  .visual-bottom h2 { max-width: 360px; margin-bottom: 8px; font-size: clamp(27px, 7vw, 36px); }
-  .visual-bottom p { max-width: 320px; font-size: 11px; }
-  .visual-kicker { margin-bottom: 7px; font-size: 8px; }
-  .visual-rule { display: none; }
-  .corner-mark { top: 48%; right: 20px; width: 40px; height: 40px; }
-  .corner-mark::before { width: 14px; }
-  .corner-mark::after { height: 14px; }
-}
-
-@media (max-width: 380px) {
-  body { padding: 9px; }
-  .login-panel { min-height: 610px; padding-inline: 21px; }
-  .visual-panel { min-height: 220px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-  }
-  .experience { transform: none !important; }
-}
-</style>
-</head>
-<body>
-  <main class="experience">
-    <section class="login-panel" aria-labelledby="login-title">
-      <a class="brand" href="/" aria-label="Uzel Prestij Garaj ana sayfa">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 16.5h16M6 16.5l1.2-5.1a2 2 0 0 1 1.95-1.54h5.7a2 2 0 0 1 1.95 1.54L18 16.5M7.2 11h9.6M8 16.5v2m8-2v2M7.4 13.2h.01m9.18 0h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="brand-name">
-          <strong>UZEL PRESTİJ</strong>
-          <span>Garaj · Premium Fleet</span>
-        </span>
-      </a>
-
-      <div class="form-wrap">
-        <div class="eyebrow">Yönetim sistemi</div>
-        <h1 id="login-title">Tekrar hoş geldiniz.</h1>
-        <p class="intro">Filo yönetim panelinize güvenli erişim için bilgilerinizi girin.</p>
-
-        <div class="hata" id="hata" role="alert" aria-live="polite"></div>
-
-        <form id="girisForm">
-          <div class="field">
-            <label for="email">E-posta adresi</label>
-            <div class="input-wrap">
-              <svg class="input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="3.5" y="5" width="17" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/>
-                <path d="m5 7 7 5.5L19 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <input type="email" id="email" autocomplete="username" required placeholder="admin@uzelprestijgaraj.com">
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="password">Şifre</label>
-            <div class="input-wrap">
-              <svg class="input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4.5" y="10" width="15" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              <input type="password" id="password" autocomplete="current-password" required placeholder="Şifrenizi girin">
-            </div>
-          </div>
-
-          <button class="submit-btn" type="submit" id="girisBtn">
-            <span>Giriş yap</span>
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </form>
-      </div>
-
-      <div>
-        <a href="/" class="back-link">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="m14.5 5-7 7 7 7M8 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Siteye dön
-        </a>
-        <div class="panel-footer">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 3.5 19 6v5.5c0 4.4-2.9 7.5-7 9-4.1-1.5-7-4.6-7-9V6l7-2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Güvenli ve şifreli yönetici erişimi
-        </div>
-      </div>
-    </section>
-
-    <section class="visual-panel" aria-label="Uzel Prestij premium araç filosu">
-      <div class="visual-top">
-        <div class="availability">Özel filo deneyimi</div>
-        <div class="image-index"><strong>01</strong> / 03</div>
-      </div>
-      <span class="corner-mark" aria-hidden="true"></span>
-      <div class="visual-bottom">
-        <div class="visual-kicker">Her yolculuk bir imza</div>
-        <h2>Prestij, detaylarda gizli.</h2>
-        <p>Seçkin araçlar, kusursuz hizmet ve ayrıcalıklı bir yolculuk deneyimi.</p>
-        <div class="visual-rule">Uzel Prestij Garaj</div>
-      </div>
-    </section>
-  </main>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0f1e">
+  <title>Yönetici Girişi | Uzel Prestij Garaj</title>
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@16.0.0"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_RJyKfjzv2lICbo27GlsyxcEx6A4trRo",
-      authDomain: "uzel-prestij-garaj.firebaseapp.com",
-      projectId: "uzel-prestij-garaj",
-      storageBucket: "uzel-prestij-garaj.firebasestorage.app",
-      messagingSenderId: "970518621544",
-      appId: "1:970518621544:web:73109bc786ecce02293add",
-      measurementId: "G-Q92PWXWTDR"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+    const client = new Appwrite.Client()
+      .setEndpoint('https://fra.cloud.appwrite.io/v1')
+      .setProject('6adc313d00284f815636');
+    const account = new Appwrite.Account(client);
   </script>
-  
-  <script>
-    const form = document.getElementById('girisForm');
-    const hata = document.getElementById('hata');
-    const btn = document.getElementById('girisBtn');
-    const experience = document.querySelector('.experience');
-    const visualPanel = document.querySelector('.visual-panel');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  <style>
+    * { box-sizing: border-box; }
 
-    if (experience && visualPanel && finePointer.matches && !reduceMotion.matches) {
-      let tiltFrame = 0;
-
-      experience.addEventListener('pointermove', event => {
-        if (tiltFrame) cancelAnimationFrame(tiltFrame);
-        tiltFrame = requestAnimationFrame(() => {
-          const bounds = experience.getBoundingClientRect();
-          const x = (event.clientX - bounds.left) / bounds.width;
-          const y = (event.clientY - bounds.top) / bounds.height;
-          const rotateY = (x - 0.5) * 8;
-          const rotateX = (0.5 - y) * 6;
-
-          experience.style.setProperty('--tilt-x', `${rotateX.toFixed(2)}deg`);
-          experience.style.setProperty('--tilt-y', `${rotateY.toFixed(2)}deg`);
-          visualPanel.style.setProperty('--pointer-x', `${(x * 100).toFixed(1)}%`);
-          visualPanel.style.setProperty('--pointer-y', `${(y * 100).toFixed(1)}%`);
-          experience.classList.add('is-tilting');
-          tiltFrame = 0;
-        });
-      });
-
-      experience.addEventListener('pointerleave', () => {
-        if (tiltFrame) cancelAnimationFrame(tiltFrame);
-        tiltFrame = 0;
-        experience.style.setProperty('--tilt-x', '0deg');
-        experience.style.setProperty('--tilt-y', '0deg');
-        visualPanel.style.removeProperty('--pointer-x');
-        visualPanel.style.removeProperty('--pointer-y');
-        experience.classList.remove('is-tilting');
-      });
+    body {
+      display: grid;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      place-items: center;
+      background: #0a0f1e;
+      color: #111827;
+      font-family: Arial, sans-serif;
     }
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        localStorage.setItem('girisYapildi', 'true');
-        window.location.replace('panel.html');
-      }
-    }, err => {
-      hata.textContent = 'Oturum durumu kontrol edilemedi. Lütfen sayfayı yenileyin.';
-      hata.classList.add('goster');
-      console.error('Firebase oturum kontrolü başarısız:', err);
-    });
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+    }
 
-    window.signInUser = async function () {
-      if (!form.reportValidity()) return;
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
 
-      const buttonLabel = btn.querySelector('span');
-      hata.classList.remove('goster');
-      btn.disabled = true;
-      buttonLabel.textContent = 'Giriş yapılıyor...';
+    .brand-logo {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      place-items: center;
+      border-radius: 50%;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 800;
+    }
 
-      try {
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
+    h1 {
+      margin: 0 0 26px;
+      color: #111827;
+      font-size: 24px;
+      text-align: center;
+    }
 
-        if (!emailInput || !passwordInput) {
-          throw new Error('Giriş formundaki e-posta veya şifre alanı bulunamadı.');
-        }
+    .field { margin-bottom: 18px; }
 
-        await auth.signInWithEmailAndPassword(
-          emailInput.value.trim(),
-          passwordInput.value
-        );
-        localStorage.setItem('girisYapildi', 'true');
-        window.location.replace('panel.html');
-      } catch (err) {
-        const mesajlar = {
-          'auth/invalid-email': 'Geçerli bir e-posta adresi girin.',
-          'auth/user-disabled': 'Bu hesap devre dışı bırakılmış.',
-          'auth/user-not-found': 'Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.',
-          'auth/wrong-password': 'E-posta adresi veya şifre hatalı.',
-          'auth/invalid-credential': 'E-posta adresi veya şifre hatalı.',
-          'auth/too-many-requests': 'Çok fazla başarısız deneme yapıldı. Lütfen daha sonra tekrar deneyin.',
-          'auth/network-request-failed': 'Bağlantı kurulamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.'
-        };
-        hata.textContent = mesajlar[err.code] || 'Giriş başarısız oldu. Lütfen bilgilerinizi kontrol edip tekrar deneyin.';
-        hata.classList.add('goster');
-        console.error('Firebase e-posta/şifre girişi başarısız:', err);
-      } finally {
-        btn.disabled = false;
-        buttonLabel.textContent = 'Giriş yap';
-      }
-    };
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-    form.addEventListener('submit', (event) => {
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      color: #111827;
+      font: inherit;
+    }
+
+    input:focus {
+      border-color: #f59e0b;
+      outline: 3px solid rgba(245, 158, 11, .2);
+    }
+
+    #girisButon {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 4px;
+      border: 0;
+      border-radius: 8px;
+      background: #f59e0b;
+      color: #111827;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    #girisButon:hover { background: #fbbf24; }
+
+    #sifremiUnuttum {
+      display: block;
+      margin-top: 20px;
+      color: #8a5a00;
+      font-size: 14px;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    #sifremiUnuttum:hover { text-decoration: underline; }
+
+    #mesaj {
+      display: none;
+      margin: 16px 0 0;
+      color: #b42318;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 32px 24px; }
+      .brand { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card">
+    <div class="brand">
+      <span class="brand-logo" aria-hidden="true">U</span>
+      <span>UZEL PRESTİJ GARAJ</span>
+    </div>
+    <h1>Yönetici Girişi</h1>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input id="email" type="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Şifre</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button id="girisButon" type="submit">GİRİŞ YAP</button>
+    </form>
+    <a id="sifremiUnuttum" href="#">Şifremi unuttum</a>
+    <p id="mesaj" role="alert"></p>
+  </main>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async event => {
       event.preventDefault();
-      window.signInUser();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const button = document.getElementById('girisButon');
+      button.disabled = true;
+      try {
+        await account.createEmailPasswordSession(email, password);
+        localStorage.setItem('girisYapildi', 'true');
+        window.location.href = 'panel.html';
+      } catch (error) {
+        console.error('Giriş hatası:', error);
+        alert('E-posta veya şifre hatalı');
+      } finally {
+        button.disabled = false;
+      }
     });
   </script>
 </body>
