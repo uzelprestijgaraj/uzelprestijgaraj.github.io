@@ -485,7 +485,10 @@ tbody tr:last-child td { border-bottom: 0; }
   }
 
   function isActiveRental(data) {
-    return ['aktif', 'kirada'].includes(String(data.durum ?? data.status ?? '').trim().toLocaleLowerCase('tr-TR'));
+    const status = String(data.durum ?? data.status ?? '').trim().toLocaleLowerCase('tr-TR');
+    if (status) return ['aktif', 'kirada'].includes(status);
+    const vehicle = vehicles.find(({ data: vehicleData }) => vehicleData.plaka === data.arac_plaka);
+    return Boolean(vehicle && vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) === 'kirada');
   }
 
   function statusLabel(status) {
@@ -529,7 +532,7 @@ tbody tr:last-child td { border-bottom: 0; }
   }
 
   function numericAmount(data) {
-    const raw = data.toplamUcret ?? data.toplamTutar ?? data.tutar ?? data.toplamFiyat ?? data.ucret ?? data.fiyat ?? 0;
+    const raw = data.toplam_ucret ?? data.toplamUcret ?? data.toplamTutar ?? data.tutar ?? data.toplamFiyat ?? data.ucret ?? data.fiyat ?? 0;
     const amount = Number(raw);
     return Number.isFinite(amount) && amount > 0 ? amount : 0;
   }
@@ -755,7 +758,22 @@ tbody tr:last-child td { border-bottom: 0; }
       convert.type = 'button';
       convert.className = 'button button-gold';
       convert.textContent = 'Kiralamaya Dönüştür';
-      convert.addEventListener('click', () => openRentalFromBooking({ id, data }));
+      convert.addEventListener('click', async () => {
+        convert.disabled = true;
+        convert.textContent = 'Dönüştürülüyor...';
+        let rentalCreated = false;
+        try {
+          rentalCreated = await kiralamayaDonustur(
+            id,
+            data.musteri_adi,
+            data.telefon || '',
+            data.arac_plaka || ''
+          );
+        } finally {
+          convert.disabled = rentalCreated;
+          convert.textContent = rentalCreated ? 'Kiralama oluşturuldu' : 'Kiralamaya Dönüştür';
+        }
+      });
       actions.appendChild(convert);
       const remove = document.createElement('button');
       remove.type = 'button';
@@ -775,18 +793,51 @@ tbody tr:last-child td { border-bottom: 0; }
     return localDate.toISOString().slice(0, 10);
   }
 
-  function openRentalFromBooking(booking) {
-    const vehiclePlate = booking.data.arac_plaka || '';
-    const vehicle = vehicles.find(item =>
-      item.data.plaka === vehiclePlate
-    );
-
+  async function kiralamayaDonustur(randevuId, musteriAdi, telefon, aracPlaka) {
+    const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
     if (!vehicle || vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) !== 'musait') {
-      showNotice('Rezervasyondaki araç bulunamadı veya şu anda müsait değil.', true);
-      return;
+      showNotice('Randevudaki plaka için müsait bir araç bulunamadı.', true);
+      return false;
     }
 
-    openRentalForm(vehicle, { ...booking.data, id: booking.id });
+    let rentalCreated = false;
+    try {
+      await databases.createDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.kiralamalar,
+        'unique()',
+        {
+          musteri_adi: musteriAdi,
+          telefon,
+          arac_plaka: aracPlaka,
+          cikis_km: 0,
+          giris_km: 0,
+          toplam_ucret: 0
+        }
+      );
+      rentalCreated = true;
+      await databases.updateDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar,
+        vehicle.id,
+        { durum: 'kirada' }
+      );
+      await databases.deleteDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.randevular,
+        randevuId
+      );
+      await fetchData();
+      showNotice('Kiralama oluşturuldu ve randevu silindi.');
+      return true;
+    } catch (error) {
+      console.error('Kiralamaya dönüştürme hatası:', error);
+      const partialMessage = rentalCreated
+        ? ' Kiralama kaydı oluşturuldu; yinelenen kayıt oluşturmadan paneli kontrol edin.'
+        : '';
+      showNotice(`Dönüştürme başarısız: ${error.message}.${partialMessage}`, true);
+      return rentalCreated;
+    }
   }
 
   function openRentalForm(vehicle, bookingData = {}) {
@@ -982,6 +1033,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
   async function fetchData() {
     await Promise.all([araclariYukle(), kiralamalariYukle(), randevulariYukle()]);
+    renderRentals();
     refreshOperationalSelects();
     updateStats();
   }
@@ -1075,7 +1127,7 @@ tbody tr:last-child td { border-bottom: 0; }
     const rentalId = document.getElementById('returnRental').value;
     const rental = rentals.find(item => item.id === rentalId);
     const entryKm = Number(document.getElementById('returnKm').value);
-    if (!rental || !Number.isFinite(entryKm) || entryKm < Number(rental.data.cikisKm || 0)) {
+    if (!rental || !Number.isFinite(entryKm) || entryKm < Number(rental.data.cikis_km ?? rental.data.cikisKm ?? 0)) {
       showNotice('Aktif kiralamayı ve çıkış KM değerinden düşük olmayan giriş KM bilgisini kontrol edin.', true);
       return;
     }
@@ -1086,24 +1138,16 @@ tbody tr:last-child td { border-bottom: 0; }
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
         rentalId,
-        {
-          durum: 'tamamlandi',
-          girisKm: entryKm,
-          yakitDurumu: document.getElementById('returnFuel').value,
-          hasarNotu: document.getElementById('returnDamage').value.trim()
-        }
+        { giris_km: entryKm }
       );
-      const vehicleId = rental.data.aracId || rental.data.vehicleId;
+      const vehicleId = rental.data.aracId || rental.data.vehicleId ||
+        vehicles.find(({ data }) => data.plaka === rental.data.arac_plaka)?.id;
       if (vehicleId) {
         await databases.updateDocument(
           appwriteDatabaseId,
           appwriteCollectionIds.araclar,
           vehicleId,
-          {
-            durum: 'musait',
-            girisKm: entryKm,
-            cikisKm: Number(rental.data.cikisKm) || 0
-          }
+          { durum: 'musait' }
         );
       }
       await fetchData();
