@@ -612,6 +612,7 @@
           musteri_adi: document.getElementById('customerName').value.trim(),
           telefon: document.getElementById('customerPhone').value.trim(),
           arac: selectedVehicle ? ([selectedVehicle.data.marka, selectedVehicle.data.model].filter(Boolean).join(' ') || selectedVehicle.data.ad || '') : '',
+          arac_plaka: selectedVehicle ? selectedVehicle.data.plaka || '' : '',
           aracId: selectedVehicle ? selectedVehicle.id : '',
           tarih: document.getElementById('bookingDate').value,
           baslangic: document.getElementById('bookingDate').value,
