@@ -687,8 +687,8 @@ tbody tr:last-child td { border-bottom: 0; }
     if (!active.length) return emptyTable(tbody, 5, 'Aktif kiralama yok.');
     active.forEach(({ id, data }) => {
       const row = tbody.insertRow();
-      tableCell(row, data.ad || data.musteri || data.musteriAdi || '—', 'name');
-      tableCell(row, data.aracAdi || data.arac || '—');
+      tableCell(row, data.musteri_adi || '—', 'name');
+      tableCell(row, data.arac_plaka || '—');
       tableCell(row, `${numericAmount(data).toLocaleString('tr-TR')} ₺`, 'price');
       row.insertCell().appendChild(statusBadge('kirada'));
       const actions = row.insertCell();
@@ -713,15 +713,15 @@ tbody tr:last-child td { border-bottom: 0; }
 
     bookings.forEach(({ id, data }) => {
       const row = tbody.insertRow();
-      tableCell(row, data.ad || data.musteri || data.musteriAdi || 'İsimsiz', 'name');
+      tableCell(row, data.musteri_adi || 'İsimsiz', 'name');
       tableCell(row, data.telefon || data.phone);
-      tableCell(row, data.arac || data.vehicle || data.hizmet);
+      tableCell(row, data.arac_plaka || '');
       tableCell(row, formatDate(data.tarih || data.baslangic));
       tableCell(row, data.hizmetTuru || data.hizmetTuruAdi || data.servis || data.hizmet || 'Kiralama');
       const status = normalizeStatus(data.durum ?? data.status, 'beklemede');
       const statusSelect = document.createElement('select');
       statusSelect.className = 'compact-select';
-      statusSelect.setAttribute('aria-label', `Rezervasyon durumu: ${data.ad || data.musteri || id}`);
+      statusSelect.setAttribute('aria-label', `Rezervasyon durumu: ${data.musteri_adi || id}`);
       [['beklemede', 'Bekliyor'], ['onaylandi', 'Onaylandı'], ['iptal', 'İptal'], ['tamamlandi', 'Tamamlandı']].forEach(([value, label]) => {
         const option = document.createElement('option');
         option.value = value;
@@ -776,12 +776,9 @@ tbody tr:last-child td { border-bottom: 0; }
   }
 
   function openRentalFromBooking(booking) {
-    const customer = booking.data.ad || booking.data.musteri || booking.data.musteriAdi || '';
-    const vehicleName = booking.data.arac || booking.data.vehicle || '';
+    const vehiclePlate = booking.data.arac_plaka || '';
     const vehicle = vehicles.find(item =>
-      item.id === (booking.data.aracId || booking.data.vehicleId) ||
-      [item.data.marka, item.data.model].filter(Boolean).join(' ') === vehicleName ||
-      item.data.ad === vehicleName
+      item.data.plaka === vehiclePlate
     );
 
     if (!vehicle || vehicleStatus(vehicle.data.durum || vehicle.data.aracDurumu) !== 'musait') {
@@ -795,7 +792,7 @@ tbody tr:last-child td { border-bottom: 0; }
   function openRentalForm(vehicle, bookingData = {}) {
     const form = document.getElementById('rentalForm');
     const vehicleSelect = document.getElementById('rentalVehicle');
-    const customerName = bookingData.ad || bookingData.musteri || bookingData.musteriAdi || '';
+    const customerName = bookingData.musteri_adi || '';
     const customerSelect = document.getElementById('rentalCustomer');
     form.reset();
     refreshOperationalSelects();
@@ -874,7 +871,7 @@ tbody tr:last-child td { border-bottom: 0; }
     const customerName = document.getElementById('rentalCustomer').value;
     const vehicle = vehicles.find(item => item.id === document.getElementById('rentalVehicle').value);
     const customer = bookings.find(item =>
-      (item.data.ad || item.data.musteri || item.data.musteriAdi) === customerName
+      item.data.musteri_adi === customerName
     );
     const start = document.getElementById('rentalStart').value;
     const end = document.getElementById('rentalEnd').value;
@@ -900,18 +897,12 @@ tbody tr:last-child td { border-bottom: 0; }
         appwriteCollectionIds.kiralamalar,
         'unique()',
         {
-          ad: customerName,
+          musteri_adi: customerName,
           telefon: customer?.data.telefon || customer?.data.phone || '',
-          aracId: vehicle.id,
-          aracAdi: [vehicle.data.marka, vehicle.data.model].filter(Boolean).join(' ') || vehicle.data.ad || '',
-          baslangic: start,
-          bitis: end,
-          gunlukUcret: dailyRate,
-          toplamUcret: total,
-          gunSayisi: Math.max(1, Math.ceil((endDate - startDate) / 86400000)),
-          cikisKm: exitKm,
-          not: document.getElementById('rentalNotes').value.trim(),
-          durum: 'aktif'
+          arac_plaka: vehicle.data.plaka || '',
+          cikis_km: exitKm,
+          giris_km: 0,
+          toplam_ucret: total
         }
       );
       await databases.updateDocument(
@@ -1040,7 +1031,7 @@ tbody tr:last-child td { border-bottom: 0; }
     }));
     const customerOptions = new Map();
     [...bookings, ...rentals].forEach(({ data }) => {
-      const name = data.ad || data.musteri || data.musteriAdi;
+      const name = data.musteri_adi;
       if (name && !customerOptions.has(name)) customerOptions.set(name, { value: name, label: name });
     });
     const rentalCustomerSelect = document.getElementById('rentalCustomer');
@@ -1060,7 +1051,7 @@ tbody tr:last-child td { border-bottom: 0; }
       .filter(({ data }) => isActiveRental(data))
       .map(({ id, data }) => ({
         value: id,
-        label: `${data.ad || data.musteri || 'Müşteri'} — ${data.aracAdi || data.arac || 'Araç'} (${formatDate(data.baslangic)})`
+        label: `${data.musteri_adi || 'Müşteri'} — ${data.arac_plaka || 'Araç'} (${formatDate(data.baslangic)})`
       }));
     addOptions(activeRentalSelect, activeOptions, 'Aktif kiralama seçin', selectedRental);
   }
@@ -1185,20 +1176,12 @@ tbody tr:last-child td { border-bottom: 0; }
         appwriteCollectionIds.randevular,
         'unique()',
         {
-          ad: document.getElementById('bookingName').value.trim(),
+          musteri_adi: document.getElementById('bookingName').value.trim(),
           telefon: document.getElementById('bookingPhone').value.trim(),
-          arac: selectedVehicle
-            ? ([selectedVehicle.data.marka, selectedVehicle.data.model].filter(Boolean).join(' ') || selectedVehicle.data.ad || '')
-            : '',
-          aracId: selectedVehicle?.id || '',
+          arac_plaka: selectedVehicle ? selectedVehicle.data.plaka || '' : '',
           tarih: date,
-          baslangic: date,
-          bitis: document.getElementById('bookingEnd').value,
-          hizmetTuru: selectedService,
           hizmet: selectedService,
-          durum: document.getElementById('bookingStatus').value,
-          toplamTutar: Number(document.getElementById('bookingAmount').value) || 0,
-          not: ''
+          durum: document.getElementById('bookingStatus').value
         }
       );
       form.reset();
