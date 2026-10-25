@@ -821,38 +821,41 @@ tbody tr:last-child td { border-bottom: 0; }
   }
 
   async function kiralamayaDonustur(randevuId, booking) {
-    const musteriAdi = booking.musteri_adi || '';
-    const telefon = booking.telefon || booking.phone || '';
-    const aracPlaka = booking.arac_plaka || '';
-    const randevuTarihi = booking.tarih || booking.baslangic_tarihi || booking.baslangic || '';
-    const toplamUcretRaw = booking.toplam_ucret ?? booking.toplamUcret ?? booking.toplamTutar ??
-      booking.tutar ?? booking.toplamFiyat ?? booking.ucret ?? booking.fiyat;
-    const toplamUcretText = toplamUcretRaw === null || toplamUcretRaw === undefined
-      ? ''
-      : String(toplamUcretRaw).trim();
-    const toplamUcret = Number(toplamUcretText);
-
-    if (!inputDate(randevuTarihi) || !dateValue(randevuTarihi) ||
-        !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret < 0) {
-      showNotice('Randevuda geçerli bir tarih ve toplam ücret bulunmalıdır.', true);
-      return false;
-    }
-
-    const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
-    if (!vehicle) {
-      showNotice('Randevudaki plaka için müsait bir araç bulunamadı.', true);
-      return false;
-    }
-
-    let rentalCreated = false;
-    let bookingDeleted = false;
+    let step = 'Randevu bilgileri doğrulanıyor';
     try {
-      const currentVehicle = await getAvailableVehicle(vehicle.id);
-      if (!currentVehicle) return false;
-      if (currentVehicle.plaka !== aracPlaka) {
-        showNotice('Araç plakası değişmiş; randevuyu yenileyip tekrar deneyin.', true);
-        return false;
+      const musteriAdi = String(booking.musteri_adi || '').trim();
+      const telefon = String(booking.telefon || booking.phone || '').trim();
+      const aracPlaka = String(booking.arac_plaka || '').trim();
+      const tarih = booking.tarih || booking.baslangic_tarihi || booking.baslangic || '';
+      const hizmet = String(booking.hizmet || booking.hizmetTuru || booking.hizmetTuruAdi || booking.servis || '').trim();
+      const toplamUcretRaw = booking.toplam_ucret ?? booking.toplamUcret ?? booking.toplamTutar ??
+        booking.tutar ?? booking.toplamFiyat ?? booking.ucret ?? booking.fiyat;
+      const toplamUcretText = toplamUcretRaw === null || toplamUcretRaw === undefined
+        ? ''
+        : String(toplamUcretRaw).trim();
+      const toplamUcret = Number(toplamUcretText);
+
+      if (!musteriAdi || !telefon || !aracPlaka || !hizmet ||
+          !inputDate(tarih) || !dateValue(tarih) ||
+          !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret < 0) {
+        throw new Error('Müşteri, telefon, plaka, tarih, hizmet ve geçerli toplam ücret bilgilerini kontrol edin.');
       }
+
+      const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
+      if (!vehicle) {
+        throw new Error(`"${aracPlaka}" plakalı araç bulunamadı.`);
+      }
+
+      step = 'Araç müsaitliği doğrulanıyor';
+      const currentVehicle = await getAvailableVehicle(vehicle.id);
+      if (!currentVehicle) {
+        throw new Error('Araç müsait olmadığı için işlem yapılamadı.');
+      }
+      if (currentVehicle.plaka !== aracPlaka) {
+        throw new Error('Araç plakası değişmiş; randevuyu yenileyip tekrar deneyin.');
+      }
+
+      step = 'Kiralama kaydı oluşturuluyor';
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.kiralamalar,
@@ -861,37 +864,40 @@ tbody tr:last-child td { border-bottom: 0; }
           musteri_adi: musteriAdi,
           telefon,
           arac_plaka: aracPlaka,
-          baslangic_tarihi: appwriteDate(randevuTarihi),
-          bitis_tarihi: appwriteDate(randevuTarihi),
+          hizmet,
+          cikis_km: 0,
+          giris_km: 0,
+          baslangic_tarihi: appwriteDate(tarih),
+          bitis_tarihi: appwriteDate(tarih),
           toplam_ucret: toplamUcret,
-          durum: 'Kirada',
+          durum: 'Kirada'
         }
       );
-      rentalCreated = true;
+
+      step = 'Araç durumu güncelleniyor';
+      await databases.updateDocument(
+        appwriteDatabaseId,
+        appwriteCollectionIds.araclar,
+        currentVehicle.$id,
+        { durum: 'Kirada' }
+      );
+
+      step = 'Randevu kaydı siliniyor';
       await databases.deleteDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.randevular,
         randevuId
       );
-      bookingDeleted = true;
-      await databases.updateDocument(
-        appwriteDatabaseId,
-        appwriteCollectionIds.araclar,
-        vehicle.id,
-        { durum: 'kirada' }
-      );
-      await fetchData();
-      showNotice('Kiralama oluşturuldu ve randevu silindi.');
+
+      location.reload();
       return true;
     } catch (error) {
-      console.error('Kiralamaya dönüştürme hatası:', error);
-      const partialMessage = !rentalCreated
-        ? ''
-        : bookingDeleted
-          ? ' Kiralama kaydı oluşturuldu ve randevu silindi; araç durumu güncellenemedi. Yinelenen kayıt oluşturmadan paneli kontrol edin.'
-          : ' Kiralama kaydı oluşturuldu; randevu silinemedi. Yinelenen kayıt oluşturmadan paneli kontrol edin.';
-      showNotice(`Dönüştürme başarısız: ${error.message}.${partialMessage}`, true);
-      return rentalCreated;
+      console.error(`Kiralamaya dönüştürme başarısız (${step}):`, error, {
+        randevuId,
+        booking
+      });
+      showNotice(`İşlem başarısız (${step}): ${error.message || error}`, true);
+      return false;
     }
   }
 
