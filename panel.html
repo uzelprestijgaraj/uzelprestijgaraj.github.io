@@ -837,8 +837,8 @@ tbody tr:last-child td { border-bottom: 0; }
 
       if (!musteriAdi || !telefon || !aracPlaka || !hizmet ||
           !inputDate(tarih) || !dateValue(tarih) ||
-          !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret < 0) {
-        throw new Error('Müşteri, telefon, plaka, tarih, hizmet ve geçerli toplam ücret bilgilerini kontrol edin.');
+          !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret <= 0) {
+        throw new Error('Müşteri, telefon, plaka, tarih, hizmet ve sıfırdan büyük geçerli toplam ücret bilgilerini kontrol edin.');
       }
 
       const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
@@ -1223,18 +1223,20 @@ tbody tr:last-child td { border-bottom: 0; }
         showNotice('Randevu tutarı sıfır veya daha büyük bir sayı olmalıdır.', true);
         return;
       }
+      const bookingData = {
+        musteri_adi: document.getElementById('bookingName').value.trim(),
+        telefon: document.getElementById('bookingPhone').value.trim(),
+        arac_plaka: currentVehicle ? currentVehicle.plaka || '' : '',
+        tarih: date,
+        hizmet: selectedService,
+        durum: 'Onaylandı'
+      };
+      if (amount !== null) bookingData.toplam_ucret = amount;
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.randevular,
         Appwrite.ID.unique(),
-        {
-          musteri_adi: document.getElementById('bookingName').value.trim(),
-          telefon: document.getElementById('bookingPhone').value.trim(),
-          arac_plaka: currentVehicle ? currentVehicle.plaka || '' : '',
-          tarih: date,
-          hizmet: selectedService,
-          durum: 'Onaylandı'
-        }
+        bookingData
       );
       form.reset();
       showNotice('Randevu kaydedildi.');
