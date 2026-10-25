@@ -833,12 +833,10 @@ tbody tr:last-child td { border-bottom: 0; }
       const toplamUcretText = toplamUcretRaw === null || toplamUcretRaw === undefined
         ? ''
         : String(toplamUcretRaw).trim();
-      const toplamUcret = Number(toplamUcretText);
+      const toplamUcret = toplamUcretText === '' ? 0 : Number(toplamUcretText) || 0;
 
-      if (!musteriAdi || !telefon || !aracPlaka || !hizmet ||
-          !inputDate(tarih) || !dateValue(tarih) ||
-          !toplamUcretText || !Number.isFinite(toplamUcret) || toplamUcret <= 0) {
-        throw new Error('Müşteri, telefon, plaka, tarih, hizmet ve sıfırdan büyük geçerli toplam ücret bilgilerini kontrol edin.');
+      if (!musteriAdi || !telefon || !aracPlaka || !inputDate(tarih) || !dateValue(tarih)) {
+        throw new Error('Müşteri, telefon, plaka ve tarih bilgilerini kontrol edin.');
       }
 
       const vehicle = vehicles.find(({ data }) => data.plaka === aracPlaka);
