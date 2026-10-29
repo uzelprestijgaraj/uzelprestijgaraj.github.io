@@ -863,8 +863,8 @@ tbody tr:last-child td { border-bottom: 0; }
           arac_plaka: aracPlaka,
           cikis_km: 0,
           giris_km: 0,
-          baslangic_tarihi: appwriteDate(tarih),
-          bitis_tarihi: appwriteDate(tarih),
+          baslangic: appwriteDate(tarih),
+          bitis: appwriteDate(tarih),
           toplam_ucret: toplamUcret,
           durum: 'Kirada'
         }
@@ -964,8 +964,8 @@ tbody tr:last-child td { border-bottom: 0; }
           giris_km: 0,
           toplam_ucret: total,
           durum: 'Kirada',
-          baslangic_tarihi: appwriteDate(startDate),
-          bitis_tarihi: appwriteDate(endDate)
+          baslangic: appwriteDate(startDate),
+          bitis: appwriteDate(endDate)
         }
       );
       await databases.updateDocument(
