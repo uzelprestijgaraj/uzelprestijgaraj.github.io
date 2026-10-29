@@ -1229,7 +1229,7 @@ tbody tr:last-child td { border-bottom: 0; }
         hizmet: selectedService,
         durum: 'Onaylandı'
       };
-      if (amount !== null) bookingData.toplam_ucret = amount;
+      if (amount !== null) bookingData.toplam_ucret = String(amount);
       await databases.createDocument(
         appwriteDatabaseId,
         appwriteCollectionIds.randevular,
