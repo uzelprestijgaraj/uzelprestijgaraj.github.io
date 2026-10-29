@@ -827,7 +827,6 @@ tbody tr:last-child td { border-bottom: 0; }
       const telefon = String(booking.telefon || booking.phone || '').trim();
       const aracPlaka = String(booking.arac_plaka || '').trim();
       const tarih = booking.tarih || booking.baslangic_tarihi || booking.baslangic || '';
-      const hizmet = String(booking.hizmet || booking.hizmetTuru || booking.hizmetTuruAdi || booking.servis || '').trim();
       const toplamUcretRaw = booking.toplam_ucret ?? booking.toplamUcret ?? booking.toplamTutar ??
         booking.tutar ?? booking.toplamFiyat ?? booking.ucret ?? booking.fiyat;
       const toplamUcretText = toplamUcretRaw === null || toplamUcretRaw === undefined
@@ -862,7 +861,6 @@ tbody tr:last-child td { border-bottom: 0; }
           musteri_adi: musteriAdi,
           telefon,
           arac_plaka: aracPlaka,
-          hizmet,
           cikis_km: 0,
           giris_km: 0,
           baslangic_tarihi: appwriteDate(tarih),
